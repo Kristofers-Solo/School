@@ -74,10 +74,31 @@ interior_organisers = IKEA('home-office/wardrobes/interior-organisers')
 kitchen_interior_organisers = IKEA('kitchen/kitchen-interior-organisers/kitchen-interior-organisers')
 light_bulbs = IKEA('bedroom/bedroom-lighting/light-bulbs')
 mattresses = IKEA('bedroom/mattresses/mattresses')
+mirrors = IKEA('kitchen/kitchen-decoration/mirrors')
+office_chairs = IKEA('home-office/work-seating-range/office-chairs')
+office_desks_and_tables = IKEA('home-office/desks/office-desks-and-tables')
+open_shelving_units = IKEA('living-room/shelving-units-systems/open-shelving-units')
+system_wardrobes = IKEA('ikea-for-business/retail/system-wardrobes')
+pendant_lamps = IKEA('ikea-for-business/retail/pendant-lamps')
+pillows = IKEA('bedroom/bedding/pillows')
+pots = IKEA('kitchen/cookware-and-dinnerware/pots')
+quilt_covers_and_pillow_cases = IKEA('bedroom/bedding/quilt-covers-and-pillow-cases')
+quilts = IKEA('bedroom/bedding/quilts')
+rugs = IKEA('living-room/home-furnishing-rugs/rugs')
+sheets_and_pillow_case = IKEA('bedroom/bedding/sheets-and-pillow-cases')
+sofa_beds_and_chair_beds = IKEA('bedroom/beds-and-sofa-beds/sofa-beds-chair-beds')
+sofa_tables = IKEA('living-room/coffee-side-tables/sofa-tables')
+solitaire_cabinets = IKEA('living-room/solitaire-cabinets/solitaire-cabinets')
+solitaire_wardrobes = IKEA('bedroom/wardrobes/solitaire-wardrobes')
+system_cabinets = IKEA('living-room/solitaire-cabinets/system-cabinets')
+table_lamps = IKEA('bedroom/bedroom-lighting/table-lamps')
+towels = IKEA('bathroom/towels/towels')
+toys_for_small_children = IKEA('children-s-room/children-3-7/toys-for-small-children')
+tv_benches = IKEA('living-room/tv-stands-media-units/tv-benches')
 
 
 def main():
-	print(mattresses.get_data())
+	print(tv_benches.get_data())
 
 
 if __name__ == '__main__':
