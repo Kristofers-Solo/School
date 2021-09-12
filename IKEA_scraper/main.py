@@ -25,11 +25,6 @@ async def ikea_curtain_catalog(message: types.Message):
 	await message.answer(curtains.get_data())
 
 
-@dp.message_handler(commands=['chairs'])
-async def ikea_curtain_catalog(message: types.Message):
-	await message.answer(chairs.get_data())
-
-
 @dp.message_handler(commands=['echo'])
 async def echo(message: types.Message):
 	await message.answer(message.text[5:])
