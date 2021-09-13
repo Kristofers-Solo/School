@@ -18,7 +18,7 @@ class IKEA:
 		page = requests.get(url, headers=HEADERS)
 		soup = BeautifulSoup(page.content, 'html.parser')
 
-		# getting page amount
+		# getting max page amount
 		for el in soup.find_all(class_='page-link'):
 			cropped_name = el.get_text().strip()
 			if cropped_name.isnumeric():
