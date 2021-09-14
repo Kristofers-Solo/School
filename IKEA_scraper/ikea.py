@@ -48,7 +48,7 @@ class IKEA:
 				prices.append(cropped_price[:cropped_price.find("€") + 1])
 
 		combined_list = [i + " - " + j for i, j in zip(names, prices)]
-		output = "\n".join(str(elem) for elem in combined_list)
+		output = "<br>".join(str(elem) for elem in combined_list)
 
 		return output
 
@@ -78,14 +78,14 @@ mirrors = IKEA('kitchen/kitchen-decoration/mirrors')
 office_chairs = IKEA('home-office/work-seating-range/office-chairs')
 office_desks_and_tables = IKEA('home-office/desks/office-desks-and-tables')
 open_shelving_units = IKEA('living-room/shelving-units-systems/open-shelving-units')
-system_wardrobes = IKEA('ikea-for-business/retail/system-wardrobes')
+pax_wardrobes = IKEA('ikea-for-business/retail/system-wardrobes')
 pendant_lamps = IKEA('ikea-for-business/retail/pendant-lamps')
 pillows = IKEA('bedroom/bedding/pillows')
 pots = IKEA('kitchen/cookware-and-dinnerware/pots')
 quilt_covers_and_pillow_cases = IKEA('bedroom/bedding/quilt-covers-and-pillow-cases')
 quilts = IKEA('bedroom/bedding/quilts')
 rugs = IKEA('living-room/home-furnishing-rugs/rugs')
-sheets_and_pillow_case = IKEA('bedroom/bedding/sheets-and-pillow-cases')
+sheets_and_pillow_cases = IKEA('bedroom/bedding/sheets-and-pillow-cases')
 sofa_beds_and_chair_beds = IKEA('bedroom/beds-and-sofa-beds/sofa-beds-chair-beds')
 sofa_tables = IKEA('living-room/coffee-side-tables/sofa-tables')
 solitaire_cabinets = IKEA('living-room/solitaire-cabinets/solitaire-cabinets')

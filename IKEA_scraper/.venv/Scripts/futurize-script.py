@@ -1,4 +1,4 @@
-#!d:\py\random\school\ikea_scraper\.venv\scripts\python.exe
+#!D:\Pyhton\random\School\IKEA_scraper\.venv\Scripts\python.exe
 # EASY-INSTALL-ENTRY-SCRIPT: 'future==0.18.2','console_scripts','futurize'
 import re
 import sys

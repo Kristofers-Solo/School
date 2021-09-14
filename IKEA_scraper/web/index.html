@@ -5,8 +5,67 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>IKEA scraper</title>
+		<link rel="stylesheet" href="style.css" />
+		<script src="eel.js"></script>
 	</head>
 	<body>
-		test
+		<select name="dropdown" id="product">
+			<option value="Armchairs">Armchairs</option>
+			<option value="Bathroom furniture">Bathroom furniture</option>
+			<option value="Bathroom lightning">Bathroom lightning</option>
+			<option value="Bed frames">Bed frames</option>
+			<option value="Bookcases">Bookcases</option>
+			<option value="Boxes and baskets">Boxes and baskets</option>
+			<option value="Ceiling lamps and spotlight">Ceiling lamps and spotlight</option>
+			<option value="Chest of drawers">Chest of drawers</option>
+			<option value="Children's storage furniture">Children's storage furniture</option>
+			<option value="curtains">Curtains</option>
+			<option value="day beds">Day beds</option>
+			<option value="dining tables">Dining tables</option>
+			<option value="dinnerware and serving">Dinnerware and serving</option>
+			<option value="glasses">Glasses</option>
+			<option value="home desks">Home desks</option>
+			<option value="interior organisers">Interior organisers</option>
+			<option value="kitchen interior organisers">Kitchen interior organisers</option>
+			<option value="light bulbs">Light bulbs</option>
+			<option value="mattresses">Mattresses</option>
+			<option value="mirrors">Mirrors</option>
+			<option value="office chairs">Office chairs</option>
+			<option value="office desks and tables">Office desks and tables</option>
+			<option value="open shelving units">Open shelving units</option>
+			<option value="pax wardrobes">PAX wardrobes</option>
+			<option value="pendant lamps">Pendant lamps</option>
+			<option value="pillows">Pillows</option>
+			<option value="pots">Pots</option>
+			<option value="quilt covers and pillow cases">Quilt covers and pillow cases</option>
+			<option value="quilts">Quilts</option>
+			<option value="rugs">Rugs</option>
+			<option value="sheets and pillow cases">Sheets and pillow cases</option>
+			<option value="sofa beds and chair beds">Sofa beds and chair beds</option>
+			<option value="sofa tables">Sofa tables</option>
+			<option value="solitaire cabinets">Solitaire cabinets</option>
+			<option value="solitaire wardrobes">Solitaire wardrobes</option>
+			<option value="system cabinets">System cabinets</option>
+			<option value="table lamps">Table lamps</option>
+			<option value="towels">Towels</option>
+			<option value="toys for small children">Toys for small children</option>
+			<option value="tv benches">TV benches</option>
+		</select>
+
+		<button id="show">Find products</button>
+
+		<div id="info"></div>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script>
+			async function call() {
+				let product = document.getElementById("product").value;
+
+				let res = await eel.call_in_js(product)();
+				document.getElementById("info").innerHTML = res;
+			}
+			jQuery("#show").on("click", function () {
+				call();
+			});
+		</script>
 	</body>
 </html>
