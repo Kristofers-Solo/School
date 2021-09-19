@@ -1,9 +1,5 @@
 from bs4 import BeautifulSoup
 import requests
-import time
-
-prices = []
-names = []
 
 HEADERS = {"User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36 Vivaldi/4.1.2369.21'}
 
@@ -14,8 +10,7 @@ class IKEA:
 
 	def _get_paige_amount(self):
 		page_amount = 1
-		url = self.url
-		page = requests.get(url, headers=HEADERS)
+		page = requests.get(self.url, headers=HEADERS)
 		soup = BeautifulSoup(page.content, 'html.parser')
 
 		# getting max page amount
@@ -29,9 +24,13 @@ class IKEA:
 		return page_amount
 
 	def get_data(self):
+		prices = []
+		names = []
+		prices.clear()
+		names.clear()
+		# combined_list.clear()
 		position = self.url.find('page=') + 5
 		for i in range(1, self._get_paige_amount() + 1):
-			time.sleep(2)
 			url = self.url[:position] + str(i) + self.url[position + 1:]
 
 			page = requests.get(url, headers=HEADERS)
@@ -48,8 +47,12 @@ class IKEA:
 				prices.append(cropped_price[:cropped_price.find("€") + 1])
 
 		combined_list = [i + " - " + j for i, j in zip(names, prices)]
-		output = "<br>".join(str(elem) for elem in combined_list)
+		if __name__ == '__main__':
+			SEPARATOR = "\n"
+		else:
+			SEPARATOR = "<br>"
 
+		output = SEPARATOR.join(str(elem) for elem in combined_list)
 		return output
 
 
@@ -98,6 +101,15 @@ tv_benches = IKEA('living-room/tv-stands-media-units/tv-benches')
 
 
 def main():
+	# import cProfile
+	# import pstats
+	# with cProfile.Profile() as pr:
+	# 	tv_benches.get_data()
+
+	# stats = pstats.Stats(pr)
+	# stats.sort_stats(pstats.SortKey.TIME)
+	# # stats.print_stats()
+	# stats.dump_stats(filename='stats.prof')
 	print(tv_benches.get_data())
 
 
