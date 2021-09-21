@@ -1,4 +1,4 @@
-#!D:\Pyhton\random\School\IKEA_scraper\.venv\Scripts\python.exe
+#!F:\Pyhton\random\School\IKEA_scraper\.venv\Scripts\python.exe
 # -*- coding: utf-8 -*-
 """
 Bottle is a fast and simple micro-framework for small web applications. It
