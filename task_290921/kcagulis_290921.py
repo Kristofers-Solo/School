@@ -1,17 +1,15 @@
 # Author - Kristiāns Francis Cagulis
-
 # Date - 29.09.2021
 
 
 # task 1 - prime numbers
 def is_prime(number):
 	import math
-
 	if number > 0:
 		if number == 1:
 			return "1 nav pirmsskaitlis"
 		else:
-			for i in range(2, int(math.sqrt(number)) + 1):
+			for i in range(2, int(math.sqrt(number)) + 1):  # range from 2 to sqrt(n)
 				if number % i == 0:
 					return f"{number} nav pirmsskaitlis"
 			return f"{number} ir pirmsskaitlis"
