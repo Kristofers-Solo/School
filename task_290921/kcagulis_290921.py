@@ -1,41 +1,39 @@
 # Author - Kristiāns Francis Cagulis
 # Date - 29.09.2021
 
-import math
 
+# task 1 - prime numbers
+def is_prime(number):
+	import math
 
-# 1. uzdevums
-def is_prime():
-	number = int(input("Ievadiet skaitli: "))
 	if number > 0:
 		if number == 1:
 			return "1 nav pirmsskaitlis"
 		else:
 			for i in range(2, int(math.sqrt(number)) + 1):
 				if number % i == 0:
-					return f"Skaitlis {number} nav pirmsskaitlis"
-			return f"Skaitlis {number} ir pirmsskaitlis"
+					return f"{number} nav pirmsskaitlis"
+			return f"{number} ir pirmsskaitlis"
 	else:
 		return "Skaitlim jābūt lielākam par 0"
 
 
-# 2. uzdevums
+# task 2 - cities
 class Cities:
 	def __init__(self, p0, perc, delta, p):
-		self.p0 = p0
-		self.perc = float(perc[:-1]) / 100
-		self.delta = delta
-		self.p = p
+		self.p0 = p0  # initial population
+		self.perc = float(perc[:-1]) / 100  # annual percentage population growth
+		self.delta = delta  # number of arrivals (departures) per year
+		self.p = p  # population size required
 
 	def _calculate(self):
 		years = 0
 		while (True):
-			result = self.p0 + self.p0 * self.perc + self.delta
-			self.p0 = result
+			self.p0 = self.p0 + self.p0 * self.perc + self.delta  # calculate the new population in each year via the formula
 			years += 1
-			if result >= self.p:
+			if self.p0 >= self.p:  # if the initial population reaches the required
 				return f"{self.p} iedzīvotāju skaits tiks sasniegts pēc {years} gadiem"
-			if result < 0:
+			if self.p0 < 0:  # if the required population is unreachable
 				return -1
 
 
@@ -52,7 +50,7 @@ def main():
 	"""))
 
 	if task == 1:
-		print(is_prime())
+		print(is_prime(int(input("Ievadiet skaitli: "))))
 	elif task == 2:
 		city = int(input("""Izvēlieties pilsētu:
 		0 - piemēra pilsēta
