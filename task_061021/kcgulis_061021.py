@@ -4,8 +4,8 @@
 CHAPTERS = 61
 
 
-def read_array():
-	with open('book.txt', encoding='utf-8') as book:
+def read_array(document):
+	with open(document, encoding='utf-8') as book:
 		lines = [line.strip('\n') for line in book]  # removes 'enter' characters
 		with open('array_output.txt', 'w') as output:
 			for i in range(1, CHAPTERS + 1):
@@ -13,9 +13,9 @@ def read_array():
 				output.write(f"Line {line} - Chapter {i}\n")  # writes line in file
 
 
-def read_string():
+def read_string(document):
 	import re
-	with open('book.txt', encoding='utf-8') as book:
+	with open(document, encoding='utf-8') as book:
 		lines = book.read()
 		with open('str_output.txt', 'w') as output:
 			for i in range(1, CHAPTERS + 1):
@@ -24,8 +24,9 @@ def read_string():
 
 
 def main():
-	read_array()
-	read_string()
+	document = input("Ievadiet faila nosaukumu: ")
+	read_array(document)
+	read_string(document)
 
 
 if __name__ == '__main__':
