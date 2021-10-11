@@ -7,7 +7,7 @@ CHAPTERS = 61
 
 # creates file with chapters and row numbers
 def read_array(document):
-	with open(document, encoding='utf-8') as book:
+	with open(document, "r", encoding='utf-8') as book:
 		lines = [line.strip('\n') for line in book]  # removes 'enter' characters
 	with open('array_output.txt', 'w') as output:
 		for i in range(1, CHAPTERS + 1):
@@ -17,7 +17,7 @@ def read_array(document):
 
 # creates file with chapter positions
 def read_string(document):
-	with open(document, encoding='utf-8') as book:
+	with open(document, "r", encoding='utf-8') as book:
 		lines = book.read()
 	with open('str_output.txt', 'w') as output:
 		for i in range(1, CHAPTERS + 1):
@@ -32,15 +32,12 @@ def read_book(document):
 
 def main():
 	try:
-		document = "book.txt"
-		read_book(document)
+		read_book("book.txt")
 	except:
 		try:
-			document = "1342-0.txt"
-			read_book(document)
+			read_book("1342-0.txt")
 		except:
-			document = input("Ievadiet faila nosaukumu: ")
-			read_book(document)
+			read_book(input("Ievadiet faila nosaukumu: "))
 
 
 if __name__ == '__main__':
