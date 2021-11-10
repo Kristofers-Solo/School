@@ -1,0 +1,23 @@
+1. 	Datu bāze ir organizēts strukturētas informācijas jeb datu kopums, kas parasti elektroniski tiek glabāts datorsistēmā
+2. 	pandas ir datu analīzes un manipulācijas bibliotēka
+3. 	matplotlib ir bibliotēka statisku, animētu un interaktīvu vizualizāciju izveidei
+4. 	seaborn padara matplotlib sarežģītākos momentus par vienkāršākiem
+5. 	1048576 rindas,  16384 kolonnas
+6. 	RAM, statistikas datu apjoms, 
+7. 	līniju diagramma - vairāku cieši saistītu datu sēriju attēlošana
+    stabiņu diagramma - datu izmaiņas noteiktā laika periodā vai salīdzinājuma attēlošana
+    riņķa diagramma - vizuālai salīdzināšanai, cik liela datu daļa atbilst katrai datu kategorijai
+    histogramma - datu kopas sadalījuma attēlošanai
+8.  viegli
+9.  no .csv faila nolasīt attiecīgās valsts nosaukumu, vidējo mirstības rādītāju, max un min mirstības rādītājus un attiecīgo pēdējo gadu, kad ir dati. 
+    Izmantojot bibliotēkas pandas, seaborn un holoviews, izveidot pasaules kartes diagrammu.
+
+
+
+Informācijas avoti:
+    https://pypi.org/project/pandas/
+    https://pypi.org/project/matplotlib/
+    https://pypi.org/project/seaborn/
+    https://pypi.org/project/holoviews/
+    https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3
+    https://www.who.int/data/gho/data/indicators/indicator-details/GHO/mortality-rate-for-5-14-year-olds-(probability-of-dying-per-1000-children-aged-5-14-years)
