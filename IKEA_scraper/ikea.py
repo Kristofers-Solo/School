@@ -1,7 +1,10 @@
 from bs4 import BeautifulSoup
 import requests
 
-HEADERS = {"User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36 Vivaldi/4.1.2369.21'}
+HEADERS = {
+    "User-Agent":
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36 Vivaldi/4.1.2369.21'
+}
 
 
 class IKEA:
@@ -53,6 +56,7 @@ class IKEA:
 			SEPARATOR = "<br>"
 
 		output = SEPARATOR.join(str(elem) for elem in combined_list)
+		print(len(names))
 		return output
 
 
@@ -89,7 +93,7 @@ quilt_covers_and_pillow_cases = IKEA('bedroom/bedding/quilt-covers-and-pillow-ca
 quilts = IKEA('bedroom/bedding/quilts')
 rugs = IKEA('living-room/home-furnishing-rugs/rugs')
 sheets_and_pillow_cases = IKEA('bedroom/bedding/sheets-and-pillow-cases')
-sofa_beds_and_chair_beds = IKEA('bedroom/beds-and-sofa-beds/sofa-beds-chair-beds')
+sofa_beds_and_chair_beds = IKEA('living-room/sofa-armchairs/sofas')
 sofa_tables = IKEA('living-room/coffee-side-tables/sofa-tables')
 solitaire_cabinets = IKEA('living-room/solitaire-cabinets/solitaire-cabinets')
 solitaire_wardrobes = IKEA('bedroom/wardrobes/solitaire-wardrobes')
