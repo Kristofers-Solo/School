@@ -39,9 +39,7 @@ class SS:
 
 	def get_data(self):
 		items = []
-		test = []
 		combined_list = []
-		combined_list.clear()
 		# combined_list.clear()
 		for page_number in range(1, self._get_page_amount() + 1):
 			url = self.url + f"/page{page_number}.html"
@@ -50,7 +48,8 @@ class SS:
 			soup = BeautifulSoup(page.content, 'html.parser')
 			ids = [tag['id'] for tag in soup.select('tr[id]')]  # creates list with ids
 			ids = [x for x in ids if "tr_bnr" not in x]  # removes "tr_bnr" from list
-			ids.pop(0)  # removes first "head_line" id
+			ids.remove("head_line")  # removes first "head_line" id
+
 			# TODO
 			# Atrašānās vieta
 			# stāvs
@@ -63,14 +62,12 @@ class SS:
 
 			# getting product name
 			for el in soup.find_all(id=ids):
-				items.clear()
 				for elem in el.find_all(class_='msga2-o pp6'):
-					item = elem.get_text()
-					items.append(item)
-				print(items)
-				combined_list.append(items)
-			# print(combined_list)
+					items.append(elem.get_text())
 
+		chunk_size = 6
+		chunked_items_list = [items[i:i + chunk_size] for i in range(0, len(items), chunk_size)]
+		# print(chunked_items_list)
 		columns = [
 		    "Atrašanās vieta",
 		    "Istabu skaits",
@@ -82,9 +79,9 @@ class SS:
 		    #"Izvietošanas datums"
 		]
 
-		# df = pd.DataFrame(combined_list)
-		# df.to_excel(excel_writer='test.xlsx', index=False)
-		# print(df)
+		df = pd.DataFrame(chunked_items_list, columns=columns)
+		df.to_excel(excel_writer='test.xlsx', index=False)
+		print(df)
 
 
 flats = SS("https://www.ss.com/lv/real-estate/flats/riga-region/all/sell")
