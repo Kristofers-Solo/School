@@ -51,12 +51,6 @@ class SS:
 			ids.remove("head_line")  # removes first "head_line" id
 
 			# TODO
-			# Atrašānās vieta
-			# stāvs
-			# istabu skaits
-			# kvadratūra
-			# cena
-			# sērija
 			# Pilns sludinājuma teksts
 			# Sludinājuma ievietošanas datums
 
@@ -67,7 +61,7 @@ class SS:
 
 		chunk_size = 6
 		chunked_items_list = [items[i:i + chunk_size] for i in range(0, len(items), chunk_size)]
-		# print(chunked_items_list)
+
 		columns = [
 		    "Atrašanās vieta",
 		    "Istabu skaits",
@@ -85,6 +79,7 @@ class SS:
 
 
 flats = SS("https://www.ss.com/lv/real-estate/flats/riga-region/all/sell")
+flats2 = SS("https://www.ss.com/lv/real-estate/flats/riga/all/sell/")
 
 
 def main():
