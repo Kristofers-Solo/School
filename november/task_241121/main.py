@@ -1,5 +1,3 @@
-from audioop import add
-from ctypes import addressof
 from bs4 import BeautifulSoup
 import requests
 
