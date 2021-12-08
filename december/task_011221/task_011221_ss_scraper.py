@@ -18,24 +18,14 @@ class SS:
 		self.url = url
 
 	def _get_page_amount(self):
-		current_page = None
-		page_amount = 1
-		url = self.url
-		while current_page != page_amount:
-			current_page = page_amount
-			page = requests.get(url, headers=HEADERS)
-			soup = BeautifulSoup(page.content, 'html.parser')
+		page = requests.get(self.url, headers=HEADERS)
+		soup = BeautifulSoup(page.content, 'html.parser')
 
-			# getting max page amount
-			for el in soup.find_all(class_='navi'):
-				cropped_number = el.get_text().strip()
-				if cropped_number.isnumeric():
-					cropped_number = int(cropped_number)
-					if cropped_number > page_amount:
-						page_amount = cropped_number
-			url = self.url + f"/page{page_amount}.html"
+		last_url = soup.find(class_='td2').findChild('a')['href']
+		page_amount = last_url[last_url.find("page") + 4:last_url.find(".html")]
 		print(f"Page amount = {page_amount}")
-		return page_amount
+
+		return int(page_amount)
 
 	def get_data(self):
 		items = []
@@ -63,7 +53,7 @@ class SS:
 				response = requests.get(image_url)
 				img = Image.open(BytesIO(response.content))
 				images.append(img)
-
+				print(img)
 				for elem in el.find_all(class_='msga2-o pp6'):
 					items.append(elem.get_text())
 
@@ -115,6 +105,7 @@ class SS:
 
 
 flats = SS("https://www.ss.com/lv/real-estate/flats/riga/all/sell/")
+flats2 = SS("https://www.ss.com/lv/real-estate/flats/riga-region/all/sell/")
 
 
 def main():
