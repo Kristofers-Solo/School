@@ -8,9 +8,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
-firefox = True
+use_firefox = True
 
-if firefox:
+if use_firefox:
 	browser = webdriver.Firefox()
 else:
 	browser = webdriver.Chrome("chromedriver")
@@ -35,9 +35,9 @@ search.click()
 browser.maximize_window()
 WebDriverWait(browser, delay).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'filter-content')))
 delay = 3
-WebDriverWait(browser, delay).until(EC.presence_of_all_elements_located((By.ID, 'filter_type_content')))
+WebDriverWait(browser, delay).until(EC.presence_of_all_elements_located((By.ID, 'filter_type_file')))
 
-filter = browser.find_element_by_css_selector("label[for='filter_type_file']")
+filter = browser.find_element_by_css_selector('label[for="filter_type_file"]')
 filter.click()
 
 search = browser.find_element_by_id('search-view-button')
