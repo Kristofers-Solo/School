@@ -10,7 +10,7 @@ from io import BytesIO
 from openpyxl.styles import Font, Alignment
 import openpyxl
 
-HEADERS = {"User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36 Vivaldi/4.1.2369.21'}
+HEADERS = {"User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.97 Safari/537.36 Vivaldi/4.1.2369.21'}
 
 
 class SS:
