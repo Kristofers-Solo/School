@@ -10,6 +10,7 @@ def main():
 	blank = data.isnull().any().sum()
 	print(f"There are empty spaces in {blank} columns")
 
+	print(data.isnull().sum())
 	print(data.columns[data.isnull().any()])
 
 
