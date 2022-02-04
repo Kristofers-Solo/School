@@ -2,7 +2,6 @@
 # Date - 05.01.2022
 # Title - main vs module
 
-from typing import final
 from module import consuption
 import pandas as pd
 

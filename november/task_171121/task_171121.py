@@ -75,14 +75,12 @@ def set_labels(title: str, xlabel: str, ylabel: str):
 
 
 def main():
-	task = input(
-	    """Ivēlieties uzdevumu:
+	task = input("""Ivēlieties uzdevumu:
 1 - pirmais uzdevums
 2 - otrais uzdevums
 3 - trešais uzdevums
 4 - ceturtais uzdevums
-"""
-	)
+""")
 
 	if task == "1":
 		task_1()

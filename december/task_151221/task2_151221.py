@@ -2,8 +2,6 @@
 # Author - Kristiāns Francis Cagulis
 # Title - Pandas demo 2
 
-from textwrap import indent
-from numpy import arctan
 import pandas as pd
 
 file = pd.ExcelFile("dati_masiviem.xlsx")
