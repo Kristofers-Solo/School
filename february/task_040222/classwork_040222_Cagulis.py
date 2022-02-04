@@ -55,18 +55,18 @@ def graph_plot():
 	# korealācija novērojama starp kolonnām [length,width,wheel-base] un [engine-size,price,horsepower]
 	# noderīga ir otrā korelācija, jo tā atklāj to savstarpējo ietekmi
 
-	# MatPlotLib heatmap veido korealāciju starp datiem savstarpēji salīdzinot to vērtības un norādot iegūtos koeficientus
-	# Seaborn heatmap veido korealāciju starp datu vērtībām pēc pašnoteiktas korealācijas skalas.
+	# matplotlib heatmap veido korealāciju starp datiem savstarpēji salīdzinot to vērtības un norādot iegūtos koeficientus
+	# seaborn heatmap veido korealāciju starp datu vērtībām pēc pašnoteiktas korealācijas skalas
 
 	sns.displot(data["price"])
 	plt.savefig("plot2.png")
 	plt.show()
 
-	plt.scatter(data["price"], data["engine-size"], list(range(0, len(data))))
+	plt.scatter(data["price"], data["engine-size"])
 	plt.savefig("plot3.png")
 	plt.show()
 
-	sns.scatterplot(data["price"], data["engine-size"], list(range(0, len(data))))
+	sns.scatterplot(data["price"], data["engine-size"])
 	plt.savefig("plot4.png")
 	plt.show()
 
