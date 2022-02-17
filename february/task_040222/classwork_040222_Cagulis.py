@@ -7,7 +7,7 @@ from word2number import w2n
 import seaborn as sns
 import matplotlib
 
-matplotlib.use('Qt5Agg')
+# matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
 
 # mathplotlib ir bibliotēka statisku, animētu un interaktīvu vizualizāciju izveidei
@@ -50,7 +50,7 @@ def graph_plot():
 	plt.figure(figsize=(15, 10))
 	sns.heatmap(data.corr())
 	plt.savefig("plot1.png")
-	plt.show()
+	# plt.show()
 
 	# korealācija novērojama starp kolonnām [length,width,wheel-base] un [engine-size,price,horsepower]
 	# noderīga ir otrā korelācija, jo tā atklāj to savstarpējo ietekmi
@@ -60,15 +60,15 @@ def graph_plot():
 
 	sns.displot(data["price"])
 	plt.savefig("plot2.png")
-	plt.show()
+	# plt.show()
 
 	plt.scatter(data["price"], data["engine-size"])
 	plt.savefig("plot3.png")
-	plt.show()
+	# plt.show()
 
 	sns.scatterplot(data["price"], data["engine-size"])
 	plt.savefig("plot4.png")
-	plt.show()
+	# plt.show()
 
 
 if __name__ == '__main__':

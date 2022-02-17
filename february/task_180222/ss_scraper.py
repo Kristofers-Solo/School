@@ -1,5 +1,5 @@
 # Author - Kristiāns Francis Cagulis
-# Date - 07.12.2021
+# Date - 17.02.2022
 # Title - Patstāvīgais darbs "SS.com scraping"
 
 from bs4 import BeautifulSoup
@@ -13,16 +13,19 @@ HEADERS = {
 
 
 class SS:
-
-	def __init__(self, url):
+	def __init__(self, url, name):
 		self.url = url
+		self.name = name
 
 	def _get_page_amount(self):
 		page = requests.get(self.url, headers=HEADERS)
 		soup = BeautifulSoup(page.content, 'html.parser')
 
-		last_url = soup.find(class_='td2').findChild('a')['href']
-		page_amount = last_url[last_url.find("page") + 4:last_url.find(".html")]
+		try:
+			last_url = soup.find(class_='td2').findChild('a')['href']
+			page_amount = last_url[last_url.find("page") + 4:last_url.find(".html")]
+		except:
+			page_amount = 1
 		print(f"Page amount = {page_amount}")
 
 		return int(page_amount)
@@ -43,15 +46,18 @@ class SS:
 			print(f"Page {page_number}")
 
 			# getting item data
-			for el in soup.find_all(id=ids):
+			for id in soup.find_all(id=ids):
 				print(f"Item {item_no}")
 				item_no += 1
 
-				for elem in el.find_all(class_='msga2-o pp6'):
+				for elem in id.find_all(class_='msga2-o pp6'):
 					items.append(elem.get_text())
 
+				if len(id.find_all(class_='msga2-o pp6')) == 7:
+					del items[-2]
+
 				# adverts url
-				item_url = el.findChild(class_='msg2').findChild('div').findChild('a')['href']  # gets url
+				item_url = id.findChild(class_='msg2').findChild('div').findChild('a')['href']  # gets url
 				item_url = "https://www.ss.com" + item_url
 				item_page = requests.get(item_url, headers=HEADERS)
 				item_soup = BeautifulSoup(item_page.content, 'html.parser')
@@ -70,16 +76,23 @@ class SS:
 		chunked_items_list = [items[i:i + chunk_size] for i in range(0, len(items), chunk_size)]  # combines each 'chunk_size' elements into array
 		columns = ["Atrašanās vieta", "Istabu skaits", "Kvadratūra", "Stāvs", "Sērija", "Cena", "Pilns sludinājuma teksts", "Izvietošanas datums"]
 		df = pd.DataFrame(chunked_items_list, columns=columns)
-		df.to_excel(excel_writer='output/output.xlsx', index=False)
+		df.to_excel(excel_writer=f"output/excel/output_{self.name}.xlsx", index=False)
 		print("Done")
 
 
-flats_many = SS("https://www.ss.com/lv/real-estate/flats/riga/all/sell/")
-flats_few = SS("https://www.ss.com/lv/real-estate/flats/riga-region/all/sell/")
+flats_many = SS("https://www.ss.com/lv/real-estate/flats/riga/all/sell/", "many")
+flats_few = SS("https://www.ss.com/lv/real-estate/flats/riga-region/all/sell/", "few")
+flats_aizkraukle = SS("https://www.ss.com/lv/real-estate/flats/aizkraukle-and-reg/sell/", "aizkraukle")
+flats_tukums = SS("https://www.ss.com/lv/real-estate/flats/tukums-and-reg/sell/", "tukums")
+flats_ogre = SS("https://www.ss.com/lv/real-estate/flats/ogre-and-reg/sell/", "ogre")
 
 
 def main():
-	flats_few.get_data()
+	flats_aizkraukle.get_data()
+	flats_tukums.get_data()
+	# flats_ogre.get_data()
+	# flats_few.get_data()
+	# flats_many.get_data()
 
 
 if __name__ == '__main__':
