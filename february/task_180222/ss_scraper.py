@@ -14,6 +14,7 @@ HEADERS = {
 
 
 class SS:
+
 	def __init__(self, url, name):
 		self.url = url
 		self.name = name
@@ -77,24 +78,20 @@ class SS:
 		chunked_items_list = [items[i:i + chunk_size] for i in range(0, len(items), chunk_size)]  # combines each 'chunk_size' elements into array
 		columns = ["Atrašanās vieta", "Istabu skaits", "Kvadratūra", "Stāvs", "Sērija", "Cena", "Pilns sludinājuma teksts", "Izvietošanas datums"]
 		df = pd.DataFrame(chunked_items_list, columns=columns)
-		time = datetime.now().strftime("%d%m%Y%H%M%S")
-		df.to_excel(excel_writer=f"output/excel/output_{self.name}_{time}.xlsx", index=False)
+		time = datetime.now().strftime("%d%m%y%H%M%S")  # current time
+		df.to_excel(excel_writer=f"output/excel/ss_{self.name}_{time}.xlsx", index=False)
 		print("Done")
 
 
-flats_many = SS("https://www.ss.com/lv/real-estate/flats/riga/all/sell/", "many")
-flats_few = SS("https://www.ss.com/lv/real-estate/flats/riga-region/all/sell/", "few")
+flats_riga = SS("https://www.ss.com/lv/real-estate/flats/riga/all/sell/", "riga")
+flats_rigareg = SS("https://www.ss.com/lv/real-estate/flats/riga-region/all/sell/", "rigareg")
 flats_aizkraukle = SS("https://www.ss.com/lv/real-estate/flats/aizkraukle-and-reg/sell/", "aizkraukle")
 flats_tukums = SS("https://www.ss.com/lv/real-estate/flats/tukums-and-reg/sell/", "tukums")
 flats_ogre = SS("https://www.ss.com/lv/real-estate/flats/ogre-and-reg/sell/", "ogre")
 
 
 def main():
-	# flats_aizkraukle.get_data()
-	# flats_tukums.get_data()
-	# flats_ogre.get_data()
-	# flats_few.get_data()
-	flats_many.get_data()
+	flats_riga.get_data()
 
 
 if __name__ == '__main__':

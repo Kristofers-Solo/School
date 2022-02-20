@@ -1,5 +1,2 @@
-from datetime import datetime
-
-time = datetime.now().strftime("%d%m%Y%H%M%S")
-
-print(time)
+val = "5.00"
+print(int((float(val))))
