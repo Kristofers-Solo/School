@@ -5,6 +5,7 @@
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
+from datetime import datetime
 
 HEADERS = {
     "User-Agent":
@@ -76,7 +77,8 @@ class SS:
 		chunked_items_list = [items[i:i + chunk_size] for i in range(0, len(items), chunk_size)]  # combines each 'chunk_size' elements into array
 		columns = ["Atrašanās vieta", "Istabu skaits", "Kvadratūra", "Stāvs", "Sērija", "Cena", "Pilns sludinājuma teksts", "Izvietošanas datums"]
 		df = pd.DataFrame(chunked_items_list, columns=columns)
-		df.to_excel(excel_writer=f"output/excel/output_{self.name}.xlsx", index=False)
+		time = datetime.now().strftime("%d%m%Y%H%M%S")
+		df.to_excel(excel_writer=f"output/excel/output_{self.name}_{time}.xlsx", index=False)
 		print("Done")
 
 
@@ -88,11 +90,11 @@ flats_ogre = SS("https://www.ss.com/lv/real-estate/flats/ogre-and-reg/sell/", "o
 
 
 def main():
-	flats_aizkraukle.get_data()
-	flats_tukums.get_data()
+	# flats_aizkraukle.get_data()
+	# flats_tukums.get_data()
 	# flats_ogre.get_data()
 	# flats_few.get_data()
-	# flats_many.get_data()
+	flats_many.get_data()
 
 
 if __name__ == '__main__':
