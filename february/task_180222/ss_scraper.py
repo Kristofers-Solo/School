@@ -1,12 +1,12 @@
 # Author - Kristiāns Francis Cagulis
-# Date - 17.02.2022
+# Date - 21.02.2022
 # Title - Patstāvīgais darbs "SS.com scraping"
 
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
-# import progressbar as pbar
 from loadbar import LoadBar
+from os import mkdir, listdir
 from datetime import datetime
 
 HEADERS = {
@@ -16,6 +16,7 @@ HEADERS = {
 
 
 class SS:
+
 	def __init__(self, url, name):
 		self.url = url
 		self.name = name
@@ -88,6 +89,8 @@ class SS:
 		columns = ["Atrašanās vieta", "Istabu skaits", "Kvadratūra", "Stāvs", "Sērija", "Cena", "Pilns sludinājuma teksts", "Izvietošanas datums"]
 		df = pd.DataFrame(chunked_items_list, columns=columns)
 		time = datetime.now().strftime("%d%m%y%H%M%S")  # current time
+		if "excel" not in listdir("output"):
+			mkdir("output/excel")
 		df.to_excel(excel_writer=f"output/excel/ss_{self.name}_{time}.xlsx", index=False)
 
 

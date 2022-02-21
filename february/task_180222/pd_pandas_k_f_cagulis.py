@@ -1,5 +1,5 @@
 # Author - Kristiāns Francis Cagulis
-# Date - 17.02.2022.
+# Date - 21.02.2022.
 # Title - Patstāvīgais darbs - pandas
 
 import pandas as pd
@@ -7,10 +7,11 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import requests
 import sys
+from os import mkdir, listdir
 from pathlib import Path
 from random import randint
 from fpdf import FPDF
-from statistics import mode
+from statistics import mode, mean
 from PIL import Image
 from io import BytesIO
 from ss_scraper import SS
@@ -46,14 +47,16 @@ series_photos = {
 }
 
 
-class priceGraphs:
-	def __init__(self, data, pos, x_value, title, xlabel, y_value=PRICE, ylabel="Price"):
+class priceGraph:
+
+	def __init__(self, data, pos, title, x_value, xlabel, xticks=None, y_value=PRICE, ylabel="Price"):
 		self.pos = pos
 		self.x_value = data[x_value]
 		self.y_value = data[y_value]
 		self.title = title
 		self.xlabel = xlabel
 		self.ylabel = ylabel
+		self.xticks = xticks
 
 	def _graph_price(self):
 		plot = plt.subplot2grid((3, 2), self.pos)
@@ -61,6 +64,8 @@ class priceGraphs:
 		plot.set_title(self.title)
 		plot.set_xlabel(self.xlabel)
 		plot.set_ylabel(self.ylabel)
+		if self.xticks != None:
+			plot.set_xticks(self.xticks)
 
 
 def read():
@@ -68,9 +73,9 @@ def read():
 
 	for file_path in files:
 		all_df.append(pd.read_excel(file_path))
-	df_combined = pd.concat(all_df).reset_index(drop=True)
-	df_combined.sort_values(by=[PRICE, PUB_DATE], inplace=True)
-	df_combined.drop_duplicates(subset="Pilns sludinājuma teksts", keep=False, inplace=True)
+	df_combined = pd.concat(all_df).reset_index(drop=True)  # combine DataFrames
+	df_combined.sort_values(by=[PRICE, PUB_DATE], inplace=True)  # sort DataFrame
+	df_combined.drop_duplicates(keep=False, inplace=True)  # drop duplicates
 
 	# replaces floor value to intiger
 	for value in df_combined[FLOOR]:
@@ -80,18 +85,19 @@ def read():
 	for value in df_combined[PRICE]:
 		df_combined = df_combined.replace(value, replace_value(value, " ", ",", ""))
 
+	# replaces "Citi" to 7
 	for _ in df_combined[ROOM_AMOUNT]:
 		df_combined = df_combined.replace(["citi", "Citi"], "7")
-	try:
-		for value in df_combined[ROOM_AMOUNT]:
-			df_combined = df_combined.replace(value, int(value))
-	except:
-		pass
+
+	# converts room amount to intiger
+	for value in df_combined[ROOM_AMOUNT]:
+		df_combined = df_combined.replace(value, int(value))
+
 	# converts to datetime
-	df_combined[PUB_DATE] = pd.to_datetime(df_combined[PUB_DATE], format="%d.%m.%Y")
+	df_combined[PUB_DATE] = pd.to_datetime(df_combined[PUB_DATE], format="%d.%m.%Y").dt.date
 
 	# df_combined.to_excel("output/excel/combined.xlsx", index=False)
-	return df_combined.sort_values(by=[PRICE, PUB_DATE])
+	return df_combined.sort_values(by=PUB_DATE)
 
 
 # replace value
@@ -117,11 +123,11 @@ def graph_price(data):
 	plt.figure(figsize=(50, 30))
 	plt.rc("font", size=15)
 
-	plot1 = priceGraphs(data, (0, 0), FLOOR, "Price to floor", "Floor")
-	plot2 = priceGraphs(data, (0, 1), ROOM_AMOUNT, "Price to room amount", "Room amount")
-	plot3 = priceGraphs(data, (1, 0), QUADRATURE, "Price to quadrature", "Quadrature")
-	plot4 = priceGraphs(data, (1, 1), SERIES, "Price to series", "Series")
-	plot5 = priceGraphs(data, (2, 0), PUB_DATE, "Price to date", "Date")
+	plot1 = priceGraph(data, (0, 0), "Price to floor", FLOOR, "Floor", range(1, max(data[FLOOR]) + 1))
+	plot2 = priceGraph(data, (0, 1), "Price to room amount", ROOM_AMOUNT, "Room amount")
+	plot3 = priceGraph(data, (1, 0), "Price to quadrature", QUADRATURE, "Quadrature")
+	plot4 = priceGraph(data, (1, 1), "Price to series", SERIES, "Series")
+	plot5 = priceGraph(data, (2, 0), "Price to date", PUB_DATE, "Date")
 
 	plot1._graph_price()
 	plot2._graph_price()
@@ -143,6 +149,7 @@ def create_pdf(data):
 	height = pdf.font_size * 2
 	LINE_HEIGHT = 5
 
+	# table head
 	for column in COLUMNS:
 		if column == PUB_DATE:
 			col_width = width * 2
@@ -151,9 +158,9 @@ def create_pdf(data):
 		pdf.cell(col_width, height, column, border=1)
 
 	pdf.ln(height)
+	# table contents
 	for _ in range(5):
 		rand_num = randint(2, len(data))
-		# print(str(data[column].iloc[rand_num]))  # TODO: ERROR
 		for column in COLUMNS:
 			if column == PUB_DATE:
 				col_width = width * 2
@@ -162,48 +169,57 @@ def create_pdf(data):
 			pdf.cell(col_width, height, str(data[column].iloc[rand_num]), border=1)
 		pdf.ln(height)
 
-	text = """
-	"Price to floor" grafiks - lielākā daļa pārdodamo dzīvokļu ir līdz 5. stāvam.
-	"Price to room amount" grafiks - jo mazāk istabu, jo lētāks dzīvoklis.
-	"Price to quadrature" grafiks - jo lielāka dzīvokļa platība, jo dārgāks dzīvoklis.
-	"Price to series" grafiks - dārgākie dzīvokļi ir jaunie.
-	"Price to date" grafiks - nesen pārdošanā ielikto dzīvokļu ir vairāk.
-	"""
 	pdf.ln(height)
-	pdf.image(f"{output_path}/korelacija.png", w=usable_w)
-	# pdf.write(LINE_HEIGHT, "Starp istabu skaitu un cenu, kvadratūru un cenu ir liela korelācija.")
-	pdf.image(f"{output_path}/cenu_grafiki.png", w=usable_w)
+	pdf.image(f"{output_path}/korelacija.png", w=usable_w)  # corr graph
+	pdf.write(LINE_HEIGHT, "Starp istabu skaitu un cenu, kvadratūru un cenu ir liela korelācija.")
+	pdf.ln(height)
+	pdf.image(f"{output_path}/cenu_grafiki.png", w=usable_w)  # price graph
 
+	# price graph conclusions
+	text = """
+	"Price to floor" grafiks - lielākā daļa pārdodamo dzīvokļu ir līdz 6. stāvam.
+	"Price to room amount" grafiks - veido normālo sadalījumu (Gausa sadalījumu).
+	"Price to quadrature" grafiks - jo lielāka dzīvokļa platība, jo dārgāks dzīvoklis.
+	"Price to series" grafiks - jaunie, renovētie un pēc kara dzīvokļi ir dārgāki.
+	"Price to date" grafiks - nav nekādas sakarības.
+	"""
 	for txt in text.split("\n"):
 		pdf.write(LINE_HEIGHT, txt.strip())
 		pdf.ln(LINE_HEIGHT)
 
-	average = calc_mode(data)
-	# print(average)
-	for key, value in average.items():
-		print(f"{key} - {value}")
-		# if not isinstance(value, str):
-		# 	value = str(round(value))
-		pdf.write(LINE_HEIGHT, f"{key} - {value}")
+	# mean/mode values
+	text = [
+	    "Vidējā cena: ", "Vidējā cena attiecībā pret kvadratūru: ", "Sērijas moda: ", "Vidējā cena attiecībā pret istabu skaitu: ",
+	    "Vidējā cena attiecībā pret stāvu: "
+	]
+	values = [
+	    round(mean(data[PRICE]), 2),
+	    round(mean(data[PRICE]) / mean(data[QUADRATURE])),
+	    mode(data[SERIES]),
+	    round(mean(data[PRICE]) / mean(data[ROOM_AMOUNT])),
+	    round(mean(data[PRICE]) / mean(data[FLOOR]))
+	]
+	for txt, value in zip(text, values):
+		pdf.write(LINE_HEIGHT, f"{txt}{value}")
 		pdf.ln(LINE_HEIGHT)
 
-	# response = requests.get(series_photos[average[SERIES]])
-	# img = Image.open(BytesIO(response.content))
-	# pdf.image(img)
-	pdf.output("output/pdf.pdf")
+	# adds photo of most frequent series
+	response = requests.get(series_photos[mode(data[SERIES])])
+	img = Image.open(BytesIO(response.content))
+	pdf.image(img)
+
+	pdf.output("output/pdf/secinajumi.pdf")
 
 
-def calc_mode(data):
-	mode_columns = {}
-	for column in COLUMNS:
-		mode_columns[column] = (mode(data[column]))
-		# if column == SERIES:
-		# 	print(data[column])
-		# 	print(f"{column} = {mode(data[column])}")
-		# else:
-		# 	print(f"{column} = {mode(data[column])}")
-		# 	mean_price_columns[column] = mode(data[PRICE]) / mode(data[column])
-	return mode_columns
+def make_dir():
+	if "output" not in listdir():
+		mkdir("output")
+	if "excel" not in listdir("output"):
+		mkdir("output/excel")
+	if "graphs" not in listdir("output"):
+		mkdir("output/graphs")
+	if "pdf" not in listdir("output"):
+		mkdir("output/pdf")
 
 
 def graph_plot():
@@ -219,15 +235,24 @@ flats_aizkraukle = SS("https://www.ss.com/lv/real-estate/flats/aizkraukle-and-re
 flats_tukums = SS("https://www.ss.com/lv/real-estate/flats/tukums-and-reg/sell/", "tukums")
 flats_ogre = SS("https://www.ss.com/lv/real-estate/flats/ogre-and-reg/sell/", "ogre")
 
+OPERATIONS = """
+python pd_pandas_k_f_cagulis.py
+python pd_pandas_k_f_cagulis.py  <operations>
+
+Operations:
+    -h --help
+    -n --new        Scrape new file
+"""
+
 
 def main(argv):
 	for arg in argv:
-		if arg == "-h" or arg == "--help":
-			print(f"{__file__}    -N --new        Scrape new file")
+		if arg in ["-h", "--help"]:
+			print(OPERATIONS)
 			exit()
-		elif arg == "-n" or arg == "--new":
+		elif arg in ["-n", "--new"]:
 			flats_riga.get_data()
-			# flats_ogre.get_data()
+	make_dir()
 	graph_plot()
 
 
