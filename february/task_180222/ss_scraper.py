@@ -5,6 +5,8 @@
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
+# import progressbar as pbar
+from loadbar import LoadBar
 from datetime import datetime
 
 HEADERS = {
@@ -14,7 +16,6 @@ HEADERS = {
 
 
 class SS:
-
 	def __init__(self, url, name):
 		self.url = url
 		self.name = name
@@ -28,16 +29,22 @@ class SS:
 			page_amount = last_url[last_url.find("page") + 4:last_url.find(".html")]
 		except:
 			page_amount = 1
-		print(f"Page amount = {page_amount}")
+		# print(f"Page amount = {page_amount}")
 
 		return int(page_amount)
 
 	def get_data(self):
 		items = []
 		item_no = 1
-		for page_number in range(1, self._get_page_amount() + 1):
-			url = self.url + f"/page{page_number}.html"
+		page_amount = self._get_page_amount()
+		# widgets = ["Getting data...", pbar.Bar("*")]
+		# bar = pbar.ProgressBar(max_value=page_amount, widgets=widgets).start()
+		bar = LoadBar(max=page_amount * 30, head="#", body="#")
+		bar.start()
 
+		for page_number in range(1, page_amount + 1):
+
+			url = self.url + f"/page{page_number}.html"
 			page = requests.get(url, headers=HEADERS)
 			soup = BeautifulSoup(page.content, 'html.parser')
 
@@ -45,11 +52,13 @@ class SS:
 			ids = [tag['id'] for tag in soup.select('tr[id]')]  # creates list with ids
 			ids = [x for x in ids if "tr_bnr" not in x]  # removes "tr_bnr" elements from list
 			ids.remove("head_line")  # removes first "head_line" id
-			print(f"Page {page_number}")
+			# print(f"Page {page_number}")
 
 			# getting item data
 			for id in soup.find_all(id=ids):
-				print(f"Item {item_no}")
+				# print(f"Item {item_no}")
+				bar.update(step=item_no)
+
 				item_no += 1
 
 				for elem in id.find_all(class_='msga2-o pp6'):
@@ -73,14 +82,13 @@ class SS:
 				item_date = item_soup.find_all('td', class_='msg_footer')  # gets all 'msg_footer' class'
 				item_date = item_date[2].get_text()  # extracts 3rd element
 				items.append(item_date[8:18])  # crops date
-
+		bar.end()
 		chunk_size = 8
 		chunked_items_list = [items[i:i + chunk_size] for i in range(0, len(items), chunk_size)]  # combines each 'chunk_size' elements into array
 		columns = ["Atrašanās vieta", "Istabu skaits", "Kvadratūra", "Stāvs", "Sērija", "Cena", "Pilns sludinājuma teksts", "Izvietošanas datums"]
 		df = pd.DataFrame(chunked_items_list, columns=columns)
 		time = datetime.now().strftime("%d%m%y%H%M%S")  # current time
 		df.to_excel(excel_writer=f"output/excel/ss_{self.name}_{time}.xlsx", index=False)
-		print("Done")
 
 
 flats_riga = SS("https://www.ss.com/lv/real-estate/flats/riga/all/sell/", "riga")
@@ -92,6 +100,7 @@ flats_ogre = SS("https://www.ss.com/lv/real-estate/flats/ogre-and-reg/sell/", "o
 
 def main():
 	flats_riga.get_data()
+	# flats_rigareg.get_data()
 
 
 if __name__ == '__main__':

@@ -6,6 +6,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import requests
+import sys
 from pathlib import Path
 from random import randint
 from fpdf import FPDF
@@ -14,8 +15,6 @@ from PIL import Image
 from io import BytesIO
 from ss_scraper import SS
 
-# flats_few = SS("https://www.ss.com/lv/real-estate/flats/riga-region/all/sell/")
-# flats_few.get_data()
 output_path = "output/graphs"
 all_df = []
 
@@ -25,6 +24,8 @@ PRICE = "Cena"
 SERIES = "Sērija"
 ROOM_AMOUNT = "Istabu skaits"
 PUB_DATE = "Izvietošanas datums"
+
+COLUMNS = [PRICE, FLOOR, ROOM_AMOUNT, SERIES, QUADRATURE, PUB_DATE]
 
 series_photos = {
     "103.": "https://i.ss.com/gallery/5/902/225301/45060087.th2.jpg",
@@ -46,7 +47,6 @@ series_photos = {
 
 
 class priceGraphs:
-
 	def __init__(self, data, pos, x_value, title, xlabel, y_value=PRICE, ylabel="Price"):
 		self.pos = pos
 		self.x_value = data[x_value]
@@ -81,7 +81,7 @@ def read():
 		df_combined = df_combined.replace(value, replace_value(value, " ", ",", ""))
 
 	for _ in df_combined[ROOM_AMOUNT]:
-		df_combined = df_combined.replace(["citi", "Citi"], "2")
+		df_combined = df_combined.replace(["citi", "Citi"], "7")
 	try:
 		for value in df_combined[ROOM_AMOUNT]:
 			df_combined = df_combined.replace(value, int(value))
@@ -111,7 +111,6 @@ def graph_corr(data):
 
 	sns.heatmap(data_corr.corr())
 	plt.savefig(f"{output_path}/korelacija.png")
-	calc_average(data_corr)
 
 
 def graph_price(data):
@@ -141,29 +140,27 @@ def create_pdf(data):
 
 	usable_w = pdf.w - 2 * pdf.l_margin
 	width = usable_w / 7
-	hight = pdf.font_size * 2
-	LINE_HIGHT = 5
+	height = pdf.font_size * 2
+	LINE_HEIGHT = 5
 
-	columns = [PRICE, FLOOR, ROOM_AMOUNT, SERIES, QUADRATURE, PUB_DATE]
-
-	for column in columns:
+	for column in COLUMNS:
 		if column == PUB_DATE:
 			col_width = width * 2
 		else:
 			col_width = width
-		pdf.cell(col_width, hight, column, border=1)
+		pdf.cell(col_width, height, column, border=1)
 
-	pdf.ln(hight)
-	pdf.set_font()
+	pdf.ln(height)
 	for _ in range(5):
-		rand_num = randint(2, len(data) - 10)
-		for column in columns:
+		rand_num = randint(2, len(data))
+		# print(str(data[column].iloc[rand_num]))  # TODO: ERROR
+		for column in COLUMNS:
 			if column == PUB_DATE:
 				col_width = width * 2
 			else:
 				col_width = width
-			pdf.cell(col_width, hight, str(data[column][rand_num]), border=1)
-		pdf.ln(hight)
+			pdf.cell(col_width, height, str(data[column].iloc[rand_num]), border=1)
+		pdf.ln(height)
 
 	text = """
 	"Price to floor" grafiks - lielākā daļa pārdodamo dzīvokļu ir līdz 5. stāvam.
@@ -172,40 +169,41 @@ def create_pdf(data):
 	"Price to series" grafiks - dārgākie dzīvokļi ir jaunie.
 	"Price to date" grafiks - nesen pārdošanā ielikto dzīvokļu ir vairāk.
 	"""
-	pdf.ln(hight)
+	pdf.ln(height)
 	pdf.image(f"{output_path}/korelacija.png", w=usable_w)
-	# pdf.write(LINE_HIGHT, "Starp istabu skaitu un cenu, kvadratūru un cenu ir liela korelācija.")
+	# pdf.write(LINE_HEIGHT, "Starp istabu skaitu un cenu, kvadratūru un cenu ir liela korelācija.")
 	pdf.image(f"{output_path}/cenu_grafiki.png", w=usable_w)
 
 	for txt in text.split("\n"):
-		pdf.write(LINE_HIGHT, txt.strip())
-		pdf.ln(LINE_HIGHT)
+		pdf.write(LINE_HEIGHT, txt.strip())
+		pdf.ln(LINE_HEIGHT)
 
-	average = calc_average(data)
+	average = calc_mode(data)
+	# print(average)
 	for key, value in average.items():
-		if not isinstance(value, str):
-			value = str(round(value))
-		pdf.write(LINE_HIGHT, f"{key} - {value}")
-		pdf.ln(LINE_HIGHT)
+		print(f"{key} - {value}")
+		# if not isinstance(value, str):
+		# 	value = str(round(value))
+		pdf.write(LINE_HEIGHT, f"{key} - {value}")
+		pdf.ln(LINE_HEIGHT)
 
-	response = requests.get(series_photos[average[SERIES]])
-	img = Image.open(BytesIO(response.content))
-	pdf.image(img)
+	# response = requests.get(series_photos[average[SERIES]])
+	# img = Image.open(BytesIO(response.content))
+	# pdf.image(img)
 	pdf.output("output/pdf.pdf")
 
 
-def calc_average(data):
-	columns = [FLOOR, ROOM_AMOUNT, SERIES, QUADRATURE]
-	mean_price_columns = {FLOOR: None, ROOM_AMOUNT: None, SERIES: None, QUADRATURE: None}
-	for column in columns:
-		if column == SERIES:
-			# print(data[column])
-			# print(f"{column} = {mode(data[column])}")
-			mean_price_columns[column] = (mode(data[SERIES]))
-		else:
-			# print(f"{column} = {mode(data[column])}")
-			mean_price_columns[column] = mode(data[PRICE]) / mode(data[column])
-	return mean_price_columns
+def calc_mode(data):
+	mode_columns = {}
+	for column in COLUMNS:
+		mode_columns[column] = (mode(data[column]))
+		# if column == SERIES:
+		# 	print(data[column])
+		# 	print(f"{column} = {mode(data[column])}")
+		# else:
+		# 	print(f"{column} = {mode(data[column])}")
+		# 	mean_price_columns[column] = mode(data[PRICE]) / mode(data[column])
+	return mode_columns
 
 
 def graph_plot():
@@ -215,9 +213,23 @@ def graph_plot():
 	create_pdf(data)
 
 
-def main():
+flats_riga = SS("https://www.ss.com/lv/real-estate/flats/riga/all/sell/", "riga")
+flats_rigareg = SS("https://www.ss.com/lv/real-estate/flats/riga-region/all/sell/", "rigareg")
+flats_aizkraukle = SS("https://www.ss.com/lv/real-estate/flats/aizkraukle-and-reg/sell/", "aizkraukle")
+flats_tukums = SS("https://www.ss.com/lv/real-estate/flats/tukums-and-reg/sell/", "tukums")
+flats_ogre = SS("https://www.ss.com/lv/real-estate/flats/ogre-and-reg/sell/", "ogre")
+
+
+def main(argv):
+	for arg in argv:
+		if arg == "-h" or arg == "--help":
+			print(f"{__file__}    -N --new        Scrape new file")
+			exit()
+		elif arg == "-n" or arg == "--new":
+			flats_riga.get_data()
+			# flats_ogre.get_data()
 	graph_plot()
 
 
 if __name__ == "__main__":
-	main()
+	main(sys.argv[1:])
