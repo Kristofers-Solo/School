@@ -75,8 +75,7 @@ def read():
 		all_df.append(pd.read_excel(file_path))
 	df_combined = pd.concat(all_df).reset_index(drop=True)  # combine DataFrames
 	df_combined.sort_values(by=[PRICE, PUB_DATE], inplace=True)  # sort DataFrame
-	df_combined.drop_duplicates(keep=False, inplace=True)  # drop duplicates
-
+	df_combined.drop_duplicates(keep="first", inplace=True)  # drop duplicates
 	# replaces floor value to intiger
 	for value in df_combined[FLOOR]:
 		df_combined = df_combined.replace(value, int(float(value[:value.find("/")])))
@@ -96,7 +95,7 @@ def read():
 	# converts to datetime
 	df_combined[PUB_DATE] = pd.to_datetime(df_combined[PUB_DATE], format="%d.%m.%Y").dt.date
 
-	# df_combined.to_excel("output/excel/combined.xlsx", index=False)
+	df_combined.to_excel("output/excel/combined.xlsx", index=False)
 	return df_combined.sort_values(by=PUB_DATE)
 
 
