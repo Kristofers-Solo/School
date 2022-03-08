@@ -1,7 +1,6 @@
 # Author - Kristiāns Francis Cagulis
 # Date - 06.03.2022
 # Title - Space invaders
-# TODO: Add score system
 # TODO: Add enemy movement in groups
 
 import pygame
@@ -40,7 +39,6 @@ RED = (188, 2, 5)
 
 
 class Missile:
-
 	def __init__(self, x: int, y: int, img) -> None:
 		self.x = x
 		self.y = y
@@ -56,8 +54,8 @@ class Missile:
 	def off_screen(self, height: int) -> bool:
 		return not (self.y <= height and self.y >= 0)
 
-	def collision(self, object) -> bool:
-		return collide(self, object)
+	def collision(self, obj) -> bool:
+		return collide(self, obj)
 
 
 class Ship:
@@ -77,14 +75,14 @@ class Ship:
 		for missile in self.missiles:
 			missile.draw(WINDOW)
 
-	def move_missiles(self, velocity: int, object) -> None:
+	def move_missiles(self, velocity: int, obj) -> None:
 		self.cooldown()
 		for missile in self.missiles:
 			missile.move(velocity)
 			if missile.off_screen(HEIGHT):
 				self.missiles.remove(missile)
-			elif missile.collision(object):
-				object.lives -= 1
+			elif missile.collision(obj):
+				obj.lives -= 1
 				self.missiles.remove(missile)
 
 	def cooldown(self) -> None:
@@ -107,24 +105,26 @@ class Ship:
 
 
 class Player(Ship):
-
 	def __init__(self, x: int, y: int, lives: int = 5) -> None:
 		super().__init__(x, y, lives)
 		self.ship_img = SPACESHIP
 		self.missile_img = PLAYER_MISSILE
 		self.mask = pygame.mask.from_surface(self.ship_img)
 		self.max_lives = lives
+		self.score = 100
 
-	def move_missiles(self, velocity: int, objects: list) -> None:
+	def move_missiles(self, velocity: int, objs: list) -> None:
 		self.cooldown()
 		for missile in self.missiles:
 			missile.move(velocity)
 			if missile.off_screen(HEIGHT):
 				self.missiles.remove(missile)
+				self.score -= 10
 			else:
-				for object in objects:
-					if missile.collision(object):
-						objects.remove(object)
+				for obj in objs:
+					if missile.collision(obj):
+						objs.remove(obj)
+						self.score += 50
 						if missile in self.missiles:
 							self.missiles.remove(missile)
 
@@ -154,10 +154,11 @@ def main() -> None:
 	level = 0
 
 	enemies = []
-	wave_length = 5
+	wave_length = 3
 	player_velocity = 7
+	player_missile_velocity = 7
 	enemy_velocity = 2
-	missile_velocity = 5
+	enemy_missile_velocity = 4
 
 	player = Player(300, 650)
 
@@ -166,9 +167,11 @@ def main() -> None:
 	def redraw_window() -> None:
 		WINDOW.blit(BACKGROUND, (0, 0))
 		# draw text
-		lives_label = set_font(50).render(f"Lives: {player.lives}", 1, WHITE)
-		level_label = set_font(50).render(f"Level: {level}", 1, WHITE)
+		lives_label = set_font(40).render(f"Lives: {player.lives}", 1, WHITE)
+		score_label = set_font(40).render(f"Score {player.score}", 1, WHITE)
+		level_label = set_font(40).render(f"Level: {level}", 1, WHITE)
 		WINDOW.blit(lives_label, (10, 10))
+		WINDOW.blit(score_label, (10, lives_label.get_height() + 10))
 		WINDOW.blit(level_label, (WIDTH - level_label.get_width() - 10, 10))
 
 		for enemy in enemies:
@@ -186,7 +189,7 @@ def main() -> None:
 		clock.tick(FPS)
 		redraw_window()
 
-		if player.lives <= 0:
+		if player.lives <= 0 or player.score <= 0:
 			lost = True
 			lost_count += 1
 
@@ -200,7 +203,8 @@ def main() -> None:
 		if len(enemies) == 0:
 			level += 1
 			wave_length += 5
-			for i in range(wave_length):
+			# spawn enemies
+			for _ in range(wave_length):
 				enemy = Enemy(randrange(50, WIDTH - 100), randrange(-1500, -100), choice(["magenta", "cyan", "lime"]))
 				enemies.append(enemy)
 
@@ -223,21 +227,22 @@ def main() -> None:
 
 		for enemy in enemies[:]:
 			enemy.move(enemy_velocity)
-			enemy.move_missiles(missile_velocity, player)
+			enemy.move_missiles(enemy_missile_velocity, player)
 
 			if randrange(0, 2 * 60) == 1:
 				enemy.shoot()
 
 			if collide(enemy, player) or (enemy.y + enemy.get_height() > HEIGHT):
+				player.score -= 10
 				player.lives -= 1
 				enemies.remove(enemy)
 
-		player.move_missiles(-missile_velocity, enemies)
+		player.move_missiles(-player_missile_velocity, enemies)
 
 
 # lambda functions
 set_font = lambda size, font=FONT: pygame.font.Font(font, size)  # sets font size
-collide = lambda obj1, obj2: obj1.mask.overlap(obj2.mask, (obj2.x - obj1.x, obj2.y - obj1.y)) != None  # checks if 2 objects collide/overlap
+collide = lambda obj1, obj2: obj1.mask.overlap(obj2.mask, (obj2.x - obj1.x, obj2.y - obj1.y)) != None  # checks if 2 objs collide/overlap
 
 
 def main_menu() -> None:
