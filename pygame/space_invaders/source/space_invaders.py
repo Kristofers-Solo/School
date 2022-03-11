@@ -124,7 +124,14 @@ class Player(Ship):
 				for obj in objs:
 					if missile.collision(obj):
 						objs.remove(obj)
-						self.score += 50
+
+						# different scores for different colored enemies
+						if obj.color == "lime":
+							self.score += 10
+						elif obj.color == "cyan":
+							self.score += 20
+						elif obj.color == "magenta":
+							self.score += 30
 						if missile in self.missiles:
 							self.missiles.remove(missile)
 
@@ -141,6 +148,7 @@ class Enemy(Ship):
 		self.ship_img = self.COLOR_MAP[color]
 		self.missile_img = ENEMY_MISSILE
 		self.mask = pygame.mask.from_surface(self.ship_img)
+		self.color = color
 
 	def move(self, vel_x: int, vel_y: int) -> None:
 		self.x += vel_x
@@ -158,12 +166,10 @@ def main() -> None:
 	player_vel = 7
 	player_missile_vel = 7
 	enemy_x_vel = 2
-	vel_y = 0
 	vel_x = enemy_x_vel
+	vel_y = 0
 	enemy_missile_vel = 4
-	# velocities = [[5, 0], [0, 2], [-5, 0], [-5, 0], [0, 2], [5, 0]]
-	# velocities = {"down": [0, 2], "right": [2, 0], "left": [-5, 0]}
-	# directions = ["right", "down", "left", "left", "down", "right"]
+	last_enemy_shot = 0
 
 	player = Player(WIDTH / 2, 650)
 
@@ -200,26 +206,23 @@ def main() -> None:
 
 		# stop game
 		if lost:
-			if lost_count > FPS * 3:
+			if lost_count > FPS * 3:  # wait for 3 sec
 				run = False
 			else:
 				continue
 
+		# spawn enemies
 		if len(enemies) == 0:
 			level += 1
 			margin = 75
-			width = 75
-			for x in range(margin, WIDTH - margin, width):
-				for y in range(margin, int(HEIGHT / 2), width):
-					
-					match y:
-						case 75:
-							color = "magenta"
-						case 150:
-							color = "cyan"
-						case 300:
-							color = "lime"
-
+			for x in range(margin, WIDTH - margin, margin):
+				for y in range(margin, int(HEIGHT / 2), margin):
+					if y == margin:
+						color = "magenta"
+					elif y == 2 * margin:
+						color = "cyan"
+					elif y == 4 * margin:
+						color = "lime"
 					enemy = Enemy(x, y, color)
 					enemies.append(enemy)
 
@@ -242,37 +245,23 @@ def main() -> None:
 
 		# enemies action
 
-		# for _ in range(len(directions)):
-		# 	if pygame.time.get_ticks() % 100 == 0:
-		# 		for direction in directions:
-		# 			vel_x, vel_y = velocities[direction]
-		# 			for enemy in enemies[:]:
-		# 				enemy.move(vel_x, vel_y)
-
-		# if pygame.time.get_ticks() % 10 == 0:
-		# 	for vel_x, vel_y in velocities:
-		# 		for enemy in enemies[:]:
-		# 			enemy.move(vel_x, vel_y)
-
 		for enemy in enemies[:]:
-			# enemy.move(0, enemy_y_vel)
-			# enemy.move(randint(-enemy_x_vel, enemy_x_vel), randint(0, enemy_y_vel))
 			if enemy.x >= WIDTH - enemy.get_width():
 				vel_x = -enemy_x_vel
 			elif enemy.x <= 0:
 				vel_x = enemy_x_vel
+
 			enemy.move(vel_x, vel_y)
 
 			enemy.move_missiles(enemy_missile_vel, player)
-
-			if randrange(0, 7 * FPS) == 1:
-				enemy.shoot()
-				pass
 
 			if collide(enemy, player) or (enemy.y + enemy.get_height() > HEIGHT):
 				player.score -= 10
 				player.lives -= 1
 				enemies.remove(enemy)
+		if pygame.time.get_ticks() - last_enemy_shot > 2000:
+			choice(enemies).shoot()
+			last_enemy_shot = pygame.time.get_ticks()
 
 		player.move_missiles(-player_missile_vel, enemies)
 
