@@ -4,7 +4,7 @@
 # TODO: Add enemy movement in groups
 
 import pygame
-from random import randrange, choice
+from random import randint, randrange, choice
 from os.path import abspath, dirname, join
 
 WIDTH, HEIGHT = 800, 800
@@ -48,8 +48,8 @@ class Missile:
 	def draw(self, window) -> None:
 		window.blit(self.img, (self.x, self.y))
 
-	def move(self, velocity: int) -> None:
-		self.y += velocity
+	def move(self, vel: int) -> None:
+		self.y += vel
 
 	def off_screen(self, height: int) -> bool:
 		return not (self.y <= height and self.y >= 0)
@@ -75,10 +75,10 @@ class Ship:
 		for missile in self.missiles:
 			missile.draw(WINDOW)
 
-	def move_missiles(self, velocity: int, obj) -> None:
+	def move_missiles(self, vel: int, obj) -> None:
 		self.cooldown()
 		for missile in self.missiles:
-			missile.move(velocity)
+			missile.move(vel)
 			if missile.off_screen(HEIGHT):
 				self.missiles.remove(missile)
 			elif missile.collision(obj):
@@ -93,7 +93,7 @@ class Ship:
 
 	def shoot(self) -> None:
 		if self.cooldown_counter == 0:
-			missile = Missile(self.x + self.get_width() / 2 - 5 / 2, self.y, self.missile_img)  # missile spawn offset
+			missile = Missile(self.x + self.get_width() / 2 - 5 / 2, self.y, self.missile_img)  # missile spawn with offset
 			self.missiles.append(missile)
 			self.cooldown_counter = 1
 
@@ -111,12 +111,12 @@ class Player(Ship):
 		self.missile_img = PLAYER_MISSILE
 		self.mask = pygame.mask.from_surface(self.ship_img)
 		self.max_lives = lives
-		self.score = 100
+		self.score = 0
 
-	def move_missiles(self, velocity: int, objs: list) -> None:
+	def move_missiles(self, vel: int, objs: list) -> None:
 		self.cooldown()
 		for missile in self.missiles:
-			missile.move(velocity)
+			missile.move(vel)
 			if missile.off_screen(HEIGHT):
 				self.missiles.remove(missile)
 				self.score -= 10
@@ -142,8 +142,14 @@ class Enemy(Ship):
 		self.missile_img = ENEMY_MISSILE
 		self.mask = pygame.mask.from_surface(self.ship_img)
 
-	def move(self, velocity: int) -> None:
-		self.y += velocity
+	def move(self, vel_x: int, vel_y: int) -> None:
+		self.x += vel_x
+		self.y += vel_y
+
+
+class EnemiesGroup(Enemy):
+	def __init__(self, rows: int, columns: int) -> None:
+		super().__init__(rows, columns)
 
 
 def main() -> None:
@@ -154,13 +160,17 @@ def main() -> None:
 	level = 0
 
 	enemies = []
-	wave_length = 3
-	player_velocity = 7
-	player_missile_velocity = 7
-	enemy_velocity = 2
-	enemy_missile_velocity = 4
+	player_vel = 7
+	player_missile_vel = 7
+	enemy_x_vel = 2
+	vel_y = 0
+	vel_x = enemy_x_vel
+	enemy_missile_vel = 4
+	# velocities = [[5, 0], [0, 2], [-5, 0], [-5, 0], [0, 2], [5, 0]]
+	# velocities = {"down": [0, 2], "right": [2, 0], "left": [-5, 0]}
+	# directions = ["right", "down", "left", "left", "down", "right"]
 
-	player = Player(300, 650)
+	player = Player(WIDTH / 2, 650)
 
 	clock = pygame.time.Clock()
 
@@ -189,7 +199,7 @@ def main() -> None:
 		clock.tick(FPS)
 		redraw_window()
 
-		if player.lives <= 0 or player.score <= 0:
+		if player.lives <= 0:
 			lost = True
 			lost_count += 1
 
@@ -202,11 +212,12 @@ def main() -> None:
 
 		if len(enemies) == 0:
 			level += 1
-			wave_length += 5
-			# spawn enemies
-			for _ in range(wave_length):
-				enemy = Enemy(randrange(50, WIDTH - 100), randrange(-1500, -100), choice(["magenta", "cyan", "lime"]))
-				enemies.append(enemy)
+			margin = 75
+			width = 75
+			for x in range(margin, WIDTH - margin, width):
+				for y in range(margin, int(HEIGHT / 2), width):
+					enemy = Enemy(x, y, choice(["magenta", "lime", "cyan"]))
+					enemies.append(enemy)
 
 		for event in pygame.event.get():
 			# quit game
@@ -216,28 +227,50 @@ def main() -> None:
 		keys = pygame.key.get_pressed()
 
 		# move left
-		if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and (player.x - player_velocity > 0):
-			player.x -= player_velocity
+		if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and (player.x - player_vel > 0):
+			player.x -= player_vel
 		# move right
-		if (keys[pygame.K_d] or keys[pygame.K_RIGHT]) and (player.x + player_velocity + player.get_width() < WIDTH):
-			player.x += player_velocity
+		if (keys[pygame.K_d] or keys[pygame.K_RIGHT]) and (player.x + player_vel + player.get_width() < WIDTH):
+			player.x += player_vel
 		# shoot
 		if keys[pygame.K_SPACE]:
 			player.shoot()
 
-		for enemy in enemies[:]:
-			enemy.move(enemy_velocity)
-			enemy.move_missiles(enemy_missile_velocity, player)
+		# enemies action
 
-			if randrange(0, 2 * 60) == 1:
-				enemy.shoot()
+		# for _ in range(len(directions)):
+		# 	if pygame.time.get_ticks() % 100 == 0:
+		# 		for direction in directions:
+		# 			vel_x, vel_y = velocities[direction]
+		# 			for enemy in enemies[:]:
+		# 				enemy.move(vel_x, vel_y)
+
+		# if pygame.time.get_ticks() % 10 == 0:
+		# 	for vel_x, vel_y in velocities:
+		# 		for enemy in enemies[:]:
+		# 			enemy.move(vel_x, vel_y)
+
+		for enemy in enemies[:]:
+			# enemy.move(0, enemy_y_vel)
+			# enemy.move(randint(-enemy_x_vel, enemy_x_vel), randint(0, enemy_y_vel))
+			if enemy.x >= WIDTH - enemy.get_width():
+				vel_x = -enemy_x_vel
+			elif enemy.x <= 0:
+				vel_x = enemy_x_vel
+			enemy.move(vel_x, vel_y)
+
+			enemy.move_missiles(enemy_missile_vel, player)
+
+			if randrange(0, 2 * FPS) == 1:
+				# enemy.shoot()
+				pass
 
 			if collide(enemy, player) or (enemy.y + enemy.get_height() > HEIGHT):
 				player.score -= 10
 				player.lives -= 1
 				enemies.remove(enemy)
 
-		player.move_missiles(-player_missile_velocity, enemies)
+		player.move_missiles(-player_missile_vel, enemies)
 
 
 # lambda functions
