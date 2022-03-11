@@ -147,11 +147,6 @@ class Enemy(Ship):
 		self.y += vel_y
 
 
-class EnemiesGroup(Enemy):
-	def __init__(self, rows: int, columns: int) -> None:
-		super().__init__(rows, columns)
-
-
 def main() -> None:
 	run = True
 	lost = False
@@ -216,7 +211,16 @@ def main() -> None:
 			width = 75
 			for x in range(margin, WIDTH - margin, width):
 				for y in range(margin, int(HEIGHT / 2), width):
-					enemy = Enemy(x, y, choice(["magenta", "lime", "cyan"]))
+					
+					match y:
+						case 75:
+							color = "magenta"
+						case 150:
+							color = "cyan"
+						case 300:
+							color = "lime"
+
+					enemy = Enemy(x, y, color)
 					enemies.append(enemy)
 
 		for event in pygame.event.get():
@@ -261,8 +265,8 @@ def main() -> None:
 
 			enemy.move_missiles(enemy_missile_vel, player)
 
-			if randrange(0, 2 * FPS) == 1:
-				# enemy.shoot()
+			if randrange(0, 7 * FPS) == 1:
+				enemy.shoot()
 				pass
 
 			if collide(enemy, player) or (enemy.y + enemy.get_height() > HEIGHT):
