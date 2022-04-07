@@ -10,18 +10,19 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (0, 128, 30)
 PURPLE = (170, 0, 255)
+BLUE = (85, 85, 255)
 RANDOM_COLOR = (randint(0, 255), randint(0, 255), randint(0, 255))
 
 SQUARE_SIZE = 30
 ROWS, COLUMNS = 30, 20
 WIDTH, HEIGHT = ROWS * SQUARE_SIZE, COLUMNS * SQUARE_SIZE
 
-RANDOM_POS = (randint(0, ROWS - 1), randint(0, COLUMNS - 1))
-
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.font.init()
 
 
 class Cube(object):
+
 	def __init__(self, start, color=RANDOM_COLOR) -> None:
 		self.pos = start
 		self.dirnx = 1
@@ -36,7 +37,6 @@ class Cube(object):
 	# eyes
 	def draw(self, surface, eyes=False) -> None:
 		distance = WIDTH // ROWS
-		# print(distance)
 		i = self.pos[0]
 		j = self.pos[1]
 
@@ -51,6 +51,7 @@ class Cube(object):
 
 
 class Snake(object):
+
 	def __init__(self, pos, color) -> None:
 		self.color = color
 		self.head = Cube(pos, self.color)
@@ -65,26 +66,47 @@ class Snake(object):
 			if event.type == pygame.QUIT:
 				pygame.quit()
 			keys = pygame.key.get_pressed()
+			if self.color == PURPLE:
+				if keys[pygame.K_LEFT]:  # turn left
+					self.dirnx = -1
+					self.dirny = 0
+					self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
 
-			if keys[pygame.K_LEFT] or keys[pygame.K_a]:  # turn left
-				self.dirnx = -1
-				self.dirny = 0
-				self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]  # turn right
+				elif keys[pygame.K_RIGHT]:  # turn right
+					self.dirnx = 1
+					self.dirny = 0
+					self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
 
-			elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-				self.dirnx = 1
-				self.dirny = 0
-				self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+				elif keys[pygame.K_UP]:  # turn up
+					self.dirnx = 0
+					self.dirny = -1
+					self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
 
-			elif keys[pygame.K_UP] or keys[pygame.K_w]:  # turn up
-				self.dirnx = 0
-				self.dirny = -1
-				self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+				elif keys[pygame.K_DOWN]:  # turn down
+					self.dirnx = 0
+					self.dirny = 1
+					self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
 
-			elif keys[pygame.K_DOWN] or keys[pygame.K_s]:  # turn down
-				self.dirnx = 0
-				self.dirny = 1
-				self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+			elif self.color == BLUE:
+				if keys[pygame.K_a]:  # turn left
+					self.dirnx = -1
+					self.dirny = 0
+					self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+
+				elif keys[pygame.K_d]:  # turn right
+					self.dirnx = 1
+					self.dirny = 0
+					self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+
+				elif keys[pygame.K_w]:  # turn up
+					self.dirnx = 0
+					self.dirny = -1
+					self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+
+				elif keys[pygame.K_s]:  # turn down
+					self.dirnx = 0
+					self.dirny = 1
+					self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
 
 		for i, head in enumerate(self.body):
 			head_pos = head.pos[:]
@@ -133,6 +155,9 @@ class Snake(object):
 		self.body[-1].dirnx = dx
 		self.body[-1].dirny = dy
 
+	def remove_cube(self) -> None:
+		self.body.pop(-1)
+
 	def draw(self, surface) -> None:
 		for i, head in enumerate(self.body):
 			if i == 0:
@@ -154,23 +179,24 @@ def draw_grid(surface) -> None:
 		pygame.draw.line(surface, WHITE, (0, y), (WIDTH, y))
 
 
-def redraw_window(snake, snack) -> None:
+def redraw_window(sprites: list) -> None:
 	WINDOW.fill(BLACK)
 	draw_grid(WINDOW)
-	snake.draw(WINDOW)
-	snack.draw(WINDOW)
+	for sprite in sprites:
+		sprite.draw(WINDOW)
 	pygame.display.update()
 
 
-def random_snack(rows, columns, item) -> tuple:
-	positions = item.body
-	while True:
-		x = randrange(rows)
-		y = randrange(columns)
-		if len(list(filter(lambda z: z.pos == (x, y), positions))) > 0:
-			continue
-		else:
-			break
+def random_snack(items, rows=ROWS, columns=COLUMNS) -> tuple:
+	for item in items:
+		positions = item.body
+		while True:
+			x = randrange(rows)
+			y = randrange(columns)
+			if len(list(filter(lambda z: z.pos == (x, y), positions))) > 0:
+				continue
+			else:
+				break
 	return x, y
 
 
@@ -178,31 +204,36 @@ def main() -> None:
 	FPS = 10
 	run = True
 	clock = pygame.time.Clock()
-	snake = Snake(RANDOM_POS, PURPLE)
-	snack = Cube(random_snack(ROWS, COLUMNS, snake), color=GREEN)
+	snake_one = Snake((randint(0, ROWS - 1), randint(0, COLUMNS - 1)), PURPLE)
+	snake_two = Snake((randint(0, ROWS - 1), randint(0, COLUMNS - 1)), BLUE)
+	snakes = [snake_one, snake_two]
+	snack = Cube(random_snack(snakes), color=GREEN)
+	poison = Cube(random_snack(snakes), color=RED)
 	while run:
 		clock.tick(FPS)
 		pygame.time.delay(50)
-		snake.move()
-		if snake.body[0].pos == snack.pos:
-			snake.add_cube()
-			snack = Cube(random_snack(ROWS, COLUMNS, snake), color=GREEN)
-		for i in range(len(snake.body)):
-			if snake.body[i].pos in list(map(lambda z: z.pos, snake.body[i + 1:])):
-				print(f"Score: {len(snake.body)}")
-				run = False
-				# snake.reset(RANDOM_POS)
-		redraw_window(snake, snack)
+		for snake in snakes:
+			snake.move()
+			if snake.body[0].pos == snack.pos:
+				snake.add_cube()
+				snack = Cube(random_snack(snakes), color=GREEN)
+			if snake.body[0].pos == poison.pos:
+				snake.remove_cube()
+				poison = Cube(random_snack(snakes), color=RED)
+			for i in range(len(snake.body)):
+				if snake.body[i].pos in list(map(lambda z: z.pos, snake.body[i + 1:])):
+					print(f"Score: {len(snake.body)}")
+					run = False
+		redraw_window(list(set(snakes + [snack, poison])))
 
 
-set_font = lambda size: pygame.font.SysFont("roboto", size)  # sets font size
+set_font = lambda size: pygame.font.SysFont("arial", size)  # sets font size
 
 
 def main_menu() -> None:
 	while True:
 		WINDOW.fill(BLACK)
-		# title_label = set_font(50).render("Press any key to start...", 1, WHITE)
-		title_label = pygame.font.SysFont("roboto", 50).render("Press any key to start...", 1, WHITE)
+		title_label = set_font(50).render("Press any key to start...", 1, WHITE)
 		WINDOW.blit(title_label, (WIDTH / 2 - title_label.get_width() / 2, HEIGHT / 2 - title_label.get_height() / 2))
 		pygame.display.update()
 		for event in pygame.event.get():
