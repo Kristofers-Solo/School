@@ -107,7 +107,7 @@ class Ship:
 
 class Player(Ship):
 
-	def __init__(self, x: int, y: int, lives: int = 3000) -> None:
+	def __init__(self, x: int, y: int, lives: int = 3) -> None:
 		super().__init__(x, y, lives)
 		self.ship_img = SPACESHIP
 		self.missile_img = PLAYER_MISSILE
@@ -167,8 +167,8 @@ def main() -> None:
 	enemies = []
 	player_vel = 7
 	player_missile_vel = 15
-	enemy_x_vel = 5
-	enemy_y_vel = 5
+	enemy_x_vel = 2
+	enemy_y_vel = 2
 	vel_x = enemy_x_vel
 	enemy_missile_vel = 6
 	last_enemy_shot = 0
@@ -252,7 +252,7 @@ def main() -> None:
 				vel_x = -enemy_x_vel
 
 			elif enemy.x <= 0:
-				move(0, -enemy_y_vel, enemies)
+				move(0, enemy_y_vel, enemies)
 				vel_x = enemy_x_vel
 
 			enemy.move_missiles(enemy_missile_vel, player)
