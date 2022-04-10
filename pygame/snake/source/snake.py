@@ -2,7 +2,6 @@
 # Date - 10.04.2022
 # Title - Snake
 
-from audioop import mul
 import pygame
 from random import randrange, randint
 from os.path import abspath, dirname, join
@@ -17,14 +16,17 @@ pygame.display.set_caption("Snake")
 
 BASE_PATH = abspath(dirname(__file__))
 SPRITE_PATH = join(BASE_PATH, "assets", "sprites")
+FONT = join(BASE_PATH, "fonts", "roboto.ttf")
 
 apple_texture = pygame.transform.scale(pygame.image.load(join(SPRITE_PATH, "golden_apple.png")), (CELL_SIZE, CELL_SIZE))
 poison_texture = pygame.transform.scale(pygame.image.load(join(SPRITE_PATH, "poison.png")), (CELL_SIZE, CELL_SIZE))
 cobblestone_texture = pygame.transform.scale(pygame.image.load(join(SPRITE_PATH, "cobblestone.jpeg")), (CELL_SIZE, CELL_SIZE))
 
 RED = (255, 0, 0)
+WHITE = (242, 242, 242)
+GRAY = (204, 204, 204)
+DARK_GRAY = (51, 51, 51)
 BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
 GREEN = (0, 128, 30)
 PURPLE = (170, 0, 255)
 BLUE = (85, 85, 255)
@@ -230,6 +232,20 @@ def main() -> None:
 	poison = Snack(poison_texture)
 	collision_check(snakes, poison)
 
+	def redraw_window() -> None:
+		WINDOW.fill(BLACK)
+		draw_grid()
+		draw_score(snakes)
+		for snake in snakes:
+			snake.draw()
+		apple.draw_snack()
+		poison.draw_snack()
+		if walls:
+			for i in range(ROWS):
+				cobble_rect = pygame.Rect(i * CELL_SIZE, HEIGHT, WIDTH, CELL_SIZE)
+				WINDOW.blit(cobblestone_texture, cobble_rect)
+		pygame.display.update()
+
 	while run:
 		clock.tick(FPS)
 		pygame.time.delay(10)
@@ -253,35 +269,24 @@ def main() -> None:
 			for i in range(len(snake.body)):
 				if snake.body[i].pos in list(map(lambda z: z.pos, snake.body[i + 1:])):
 					run = False
-
-		WINDOW.fill(BLACK)
-		draw_grid()
-		draw_score(snakes)
-		for snake in snakes:
-			snake.draw()
-		apple.draw_snack()
-		poison.draw_snack()
-		if walls:
-			for i in range(ROWS):
-				cobble_rect = pygame.Rect(i * CELL_SIZE, HEIGHT, WIDTH, CELL_SIZE)
-				WINDOW.blit(cobblestone_texture, cobble_rect)
-		pygame.display.update()
+		redraw_window()
 
 
-set_font = lambda size: pygame.font.SysFont("roboto", size)  # sets font size
+set_font = lambda size: pygame.font.Font(FONT, size)  # sets font size
 
 
 def main_menu() -> None:
+	text = set_font(20).render("QUIT", 1, GRAY)
 	while True:
 		WINDOW.fill(BLACK)
 		title_label = set_font(50).render("Press any key to start...", 1, WHITE)
 		WINDOW.blit(title_label, (WIDTH / 2 - title_label.get_width() / 2, WINDOW_HEIGHT / 2 - title_label.get_height() / 2))
-		pygame.display.update()
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				quit()
 			if event.type == pygame.KEYDOWN:
 				main()
+		pygame.display.update()
 
 
 if __name__ == '__main__':
