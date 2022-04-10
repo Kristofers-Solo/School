@@ -2,6 +2,7 @@
 # Date - 10.04.2022
 # Title - Snake
 
+from audioop import mul
 import pygame
 from random import randrange, randint
 from os.path import abspath, dirname, join
@@ -9,8 +10,8 @@ from os.path import abspath, dirname, join
 CELL_SIZE = 30
 ROWS, COLUMNS = 30, 20
 WIDTH, HEIGHT = ROWS * CELL_SIZE, COLUMNS * CELL_SIZE
-
-WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
+WINDOW_HEIGHT = HEIGHT + 100
+WINDOW = pygame.display.set_mode((WIDTH, WINDOW_HEIGHT))
 pygame.font.init()
 pygame.display.set_caption("Snake")
 
@@ -19,6 +20,7 @@ SPRITE_PATH = join(BASE_PATH, "assets", "sprites")
 
 apple_texture = pygame.transform.scale(pygame.image.load(join(SPRITE_PATH, "golden_apple.png")), (CELL_SIZE, CELL_SIZE))
 poison_texture = pygame.transform.scale(pygame.image.load(join(SPRITE_PATH, "poison.png")), (CELL_SIZE, CELL_SIZE))
+cobblestone_texture = pygame.transform.scale(pygame.image.load(join(SPRITE_PATH, "cobblestone.jpeg")), (CELL_SIZE, CELL_SIZE))
 
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
@@ -43,18 +45,18 @@ class Cube:
 		self.direction = direction
 		self.pos = (self.pos[0] + self.direction[0], self.pos[1] + self.direction[1])
 
-	def draw(self, surface=WINDOW, eyes=False) -> None:
+	def draw(self, eyes=False) -> None:
 		distance = WIDTH // ROWS
 		i, j = self.pos
 
-		pygame.draw.rect(surface, self.color, (i * distance + 1, j * distance + 1, distance - 2, distance - 2))
+		pygame.draw.rect(WINDOW, self.color, (i * distance + 1, j * distance + 1, distance - 2, distance - 2))
 		if eyes:
 			center = distance // 2
 			radius = 3
 			circle_middle = (i * distance + center - radius, j * distance + 8)
 			circle_middle_2 = (i * distance + distance - radius * 2, j * distance + 8)
-			pygame.draw.circle(surface, BLACK, circle_middle, radius)
-			pygame.draw.circle(surface, BLACK, circle_middle_2, radius)
+			pygame.draw.circle(WINDOW, BLACK, circle_middle, radius)
+			pygame.draw.circle(WINDOW, BLACK, circle_middle_2, radius)
 
 
 class Snake:
@@ -118,16 +120,17 @@ class Snake:
 					self.turns.pop(head_pos)
 			else:
 				if walls:  # end game if goes into the wall
-					if head.direction[0] == -1 and head.pos[0] <= 0:  # left to right
+					head.move(head.direction)
+					if head.direction[0] == -1 and head.pos[0] < 0:  # left to right
 						end_screen()
 
-					if head.direction[0] == 1 and head.pos[0] >= ROWS - 1:  # right to left
+					if head.direction[0] == 1 and head.pos[0] >= ROWS:  # right to left
 						end_screen()
 
-					if head.direction[1] == 1 and head.pos[1] >= COLUMNS - 1:  # bottom to top
+					if head.direction[1] == 1 and head.pos[1] >= COLUMNS:  # bottom to top
 						end_screen()
 
-					if head.direction[1] == -1 and head.pos[1] <= 0:  # top to bottom
+					if head.direction[1] == -1 and head.pos[1] < 0:  # top to bottom
 						end_screen()
 
 				else:  # move player to other screen size
@@ -184,15 +187,27 @@ class Snack:
 		self.pos = (randrange(ROWS), randrange(COLUMNS))
 
 
-def draw_grid(surface=WINDOW) -> None:
-	size_between = WIDTH // ROWS
+def draw_grid() -> None:
 	x, y = 0, 0
 	for _ in range(ROWS):
-		x += size_between
-		y += size_between
+		x += CELL_SIZE
+		pygame.draw.line(WINDOW, WHITE, (x, 0), (x, HEIGHT))
+	for _ in range(COLUMNS):
+		y += CELL_SIZE
+		pygame.draw.line(WINDOW, WHITE, (0, y), (WIDTH, y))
 
-		pygame.draw.line(surface, WHITE, (x, 0), (x, HEIGHT))
-		pygame.draw.line(surface, WHITE, (0, y), (WIDTH, y))
+
+def draw_score(snakes) -> None:
+	for index, snake in enumerate(snakes):
+		score_label = set_font(40).render(f"Score {len(snake.body) - 1}", 1, snake.color)
+		WINDOW.blit(score_label, (10 + (index * (WIDTH - score_label.get_width() - 20)), (WINDOW_HEIGHT - score_label.get_height())))
+
+
+def collision_check(snakes, snack) -> None:
+	for snake in snakes:
+		for block in snake.body:
+			if block.pos == snack.pos:
+				snack.randomize()
 
 
 def end_screen() -> None:
@@ -211,7 +226,9 @@ def main() -> None:
 		snakes.append(snake_two)
 
 	apple = Snack(apple_texture)
+	collision_check(snakes, apple)
 	poison = Snack(poison_texture)
+	collision_check(snakes, poison)
 
 	while run:
 		clock.tick(FPS)
@@ -223,27 +240,31 @@ def main() -> None:
 
 		for snake in snakes:
 			snake.move()
-
 			if snake.body[0].pos == apple.pos:
 				snake.add_cube()
 				apple = Snack(apple_texture)
+				collision_check(snakes, apple)
 
 			if snake.body[0].pos == poison.pos:
 				snake.remove_cube()
 				poison = Snack(poison_texture)
+				collision_check(snakes, poison)
 
 			for i in range(len(snake.body)):
 				if snake.body[i].pos in list(map(lambda z: z.pos, snake.body[i + 1:])):
-					for snake in snakes:
-						print(f"{snake.number} snake score: {len(snake.body)}")
 					run = False
 
 		WINDOW.fill(BLACK)
 		draw_grid()
+		draw_score(snakes)
 		for snake in snakes:
 			snake.draw()
 		apple.draw_snack()
 		poison.draw_snack()
+		if walls:
+			for i in range(ROWS):
+				cobble_rect = pygame.Rect(i * CELL_SIZE, HEIGHT, WIDTH, CELL_SIZE)
+				WINDOW.blit(cobblestone_texture, cobble_rect)
 		pygame.display.update()
 
 
@@ -254,7 +275,7 @@ def main_menu() -> None:
 	while True:
 		WINDOW.fill(BLACK)
 		title_label = set_font(50).render("Press any key to start...", 1, WHITE)
-		WINDOW.blit(title_label, (WIDTH / 2 - title_label.get_width() / 2, HEIGHT / 2 - title_label.get_height() / 2))
+		WINDOW.blit(title_label, (WIDTH / 2 - title_label.get_width() / 2, WINDOW_HEIGHT / 2 - title_label.get_height() / 2))
 		pygame.display.update()
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
