@@ -1,5 +1,5 @@
 # Author - Kristiāns Francis Cagulis
-# Date - 28.03.2022
+# Date - 10.04.2022
 # Title - Snake
 
 import pygame
@@ -20,25 +20,23 @@ WIDTH, HEIGHT = ROWS * SQUARE_SIZE, COLUMNS * SQUARE_SIZE
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.font.init()
 
+multiplayer = False
+
 
 class Cube(object):
 
-	def __init__(self, start, color=RANDOM_COLOR) -> None:
-		self.pos = start
-		self.dirnx = 1
-		self.dirny = 0
+	def __init__(self, start_pos, color=RANDOM_COLOR) -> None:
+		self.pos = start_pos
+		self.direction = (1, 0)
 		self.color = color
 
-	def move(self, dirnx, dirny) -> None:
-		self.dirnx = dirnx
-		self.dirny = dirny
-		self.pos = (self.pos[0] + self.dirnx, self.pos[1] + self.dirny)
+	def move(self, direction: tuple) -> None:
+		self.direction = direction
+		self.pos = (self.pos[0] + self.direction[0], self.pos[1] + self.direction[1])
 
-	# eyes
 	def draw(self, surface, eyes=False) -> None:
 		distance = WIDTH // ROWS
-		i = self.pos[0]
-		j = self.pos[1]
+		i, j = self.pos
 
 		pygame.draw.rect(surface, self.color, (i * distance + 1, j * distance + 1, distance - 2, distance - 2))
 		if eyes:
@@ -52,125 +50,111 @@ class Cube(object):
 
 class Snake(object):
 
-	def __init__(self, pos, color) -> None:
+	def __init__(self, pos: tuple, color: tuple, player_number: int = 1) -> None:
 		self.color = color
 		self.head = Cube(pos, self.color)
 		self.body = []
 		self.body.append(self.head)
 		self.turns = {}
-		self.dirnx = 0
-		self.dirny = 1
+		self.direction = (1, 0)
+		self.number = player_number
 
 	def move(self) -> None:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				pygame.quit()
 			keys = pygame.key.get_pressed()
-			if self.color == PURPLE:
-				if keys[pygame.K_LEFT]:  # turn left
-					self.dirnx = -1
-					self.dirny = 0
-					self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
 
-				elif keys[pygame.K_RIGHT]:  # turn right
-					self.dirnx = 1
-					self.dirny = 0
-					self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+			if multiplayer:
+				num_1, num_2 = 1, 2
+			else:
+				num_1, num_2 = 1, 1
 
-				elif keys[pygame.K_UP]:  # turn up
-					self.dirnx = 0
-					self.dirny = -1
-					self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+			if self.number == num_1:
+				if keys[pygame.K_LEFT] and self.direction != (1, 0):  # turn left
+					self.direction = -1, 0
 
-				elif keys[pygame.K_DOWN]:  # turn down
-					self.dirnx = 0
-					self.dirny = 1
-					self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+				if keys[pygame.K_RIGHT] and self.direction != (-1, 0):  # turn right
+					self.direction = 1, 0
 
-			elif self.color == BLUE:
-				if keys[pygame.K_a]:  # turn left
-					self.dirnx = -1
-					self.dirny = 0
-					self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+				if keys[pygame.K_UP] and self.direction != (0, 1):  # turn up
+					self.direction = 0, -1
 
-				elif keys[pygame.K_d]:  # turn right
-					self.dirnx = 1
-					self.dirny = 0
-					self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+				if keys[pygame.K_DOWN] and self.direction != (0, -1):  # turn down
+					self.direction = 0, 1
 
-				elif keys[pygame.K_w]:  # turn up
-					self.dirnx = 0
-					self.dirny = -1
-					self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+			if self.number == num_2:
+				if keys[pygame.K_a] and self.direction != (1, 0):  # turn left
+					self.direction = -1, 0
 
-				elif keys[pygame.K_s]:  # turn down
-					self.dirnx = 0
-					self.dirny = 1
-					self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+				if keys[pygame.K_d] and self.direction != (-1, 0):  # turn right
+					self.direction = 1, 0
 
-		for i, head in enumerate(self.body):
+				if keys[pygame.K_w] and self.direction != (0, 1):  # turn up
+					self.direction = 0, -1
+
+				if keys[pygame.K_s] and self.direction != (0, -1):  # turn down
+					self.direction = 0, 1
+
+				self.turns[self.head.pos[:]] = self.direction
+
+		for index, head in enumerate(self.body):
 			head_pos = head.pos[:]
 			if head_pos in self.turns:
 				turn = self.turns[head_pos]
-				head.move(turn[0], turn[1])
-				if i == len(self.body) - 1:
+				head.move((turn[0], turn[1]))
+				if index == len(self.body) - 1:
 					self.turns.pop(head_pos)
 
 			else:  # move player to other screen size
-				if head.dirnx == -1 and head.pos[0] <= 0:  # left to right
+				if head.direction[0] == -1 and head.pos[0] <= 0:  # left to right
 					head.pos = (ROWS - 1, head.pos[1])
 
-				elif head.dirnx == 1 and head.pos[0] >= ROWS - 1:  # right to left
+				elif head.direction[0] == 1 and head.pos[0] >= ROWS - 1:  # right to left
 					head.pos = (0, head.pos[1])
 
-				elif head.dirny == 1 and head.pos[1] >= COLUMNS - 1:  # bottom to top
+				elif head.direction[1] == 1 and head.pos[1] >= COLUMNS - 1:  # bottom to top
 					head.pos = (head.pos[0], 0)
 
-				elif head.dirny == -1 and head.pos[1] <= 0:  # top to bottom
+				elif head.direction[1] == -1 and head.pos[1] <= 0:  # top to bottom
 					head.pos = (head.pos[0], COLUMNS - 1)
 
 				else:
-					head.move(head.dirnx, head.dirny)
+					head.move(head.direction)
 
-	def reset(self, pos) -> None:
-		self.head = Cube(pos, self.color)
-		self.body = []
-		self.turns = {}
-		self.dirnx = 0
-		self.dirny = 1
+	# def reset(self, pos) -> None:
+	# 	self.head = Cube(pos, self.color)
+	# 	self.body = []
+	# 	self.turns = {}
+	# 	self.direction = randint(-1, 1), randint(-1, 1)
 
 	def add_cube(self) -> None:
 		tail = self.body[-1]
-		dx, dy = tail.dirnx, tail.dirny
-
-		if dx == 1 and dy == 0:
+		if tail.direction == (1, 0):
 			self.body.append(Cube((tail.pos[0] - 1, tail.pos[1]), self.color))
-		elif dx == -1 and dy == 0:
+		elif tail.direction == (-1, 0):
 			self.body.append(Cube((tail.pos[0] + 1, tail.pos[1]), self.color))
-		elif dx == 0 and dy == 1:
+		elif tail.direction == (0, 1):
 			self.body.append(Cube((tail.pos[0], tail.pos[1] - 1), self.color))
-		elif dx == 0 and dy == -1:
+		elif tail.direction == (0, -1):
 			self.body.append(Cube((tail.pos[0], tail.pos[1] + 1), self.color))
 
-		self.body[-1].dirnx = dx
-		self.body[-1].dirny = dy
+		self.body[-1].direction = tail.direction
 
 	def remove_cube(self) -> None:
 		self.body.pop(-1)
 
 	def draw(self, surface) -> None:
-		for i, head in enumerate(self.body):
-			if i == 0:
-				head.draw(surface, True)
-
+		for index, head in enumerate(self.body):
+			if index == 0:
+				head.draw(surface, eyes=True)
 			else:
 				head.draw(surface)
 
 
 def draw_grid(surface) -> None:
 	size_between = WIDTH // ROWS
-	x = 0
-	y = 0
+	x, y = 0, 0
 	for _ in range(ROWS):
 		x += size_between
 		y += size_between
@@ -205,8 +189,12 @@ def main() -> None:
 	run = True
 	clock = pygame.time.Clock()
 	snake_one = Snake((randint(0, ROWS - 1), randint(0, COLUMNS - 1)), PURPLE)
-	snake_two = Snake((randint(0, ROWS - 1), randint(0, COLUMNS - 1)), BLUE)
-	snakes = [snake_one, snake_two]
+	snakes = [snake_one]
+
+	if multiplayer:
+		snake_two = Snake((randint(0, ROWS - 1), randint(0, COLUMNS - 1)), BLUE, 2)
+		snakes.append(snake_two)
+
 	snack = Cube(random_snack(snakes), color=GREEN)
 	poison = Cube(random_snack(snakes), color=RED)
 	while run:
@@ -227,7 +215,7 @@ def main() -> None:
 		redraw_window(list(set(snakes + [snack, poison])))
 
 
-set_font = lambda size: pygame.font.SysFont("arial", size)  # sets font size
+set_font = lambda size: pygame.font.SysFont("roboto", size)  # sets font size
 
 
 def main_menu() -> None:
