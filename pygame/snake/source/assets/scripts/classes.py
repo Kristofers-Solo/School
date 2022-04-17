@@ -3,10 +3,6 @@ from globals import *
 from random import randrange
 
 
-def end_screen() -> None:
-	quit()
-
-
 class Cube:
 
 	def __init__(self, position, color=PURPLE) -> None:
@@ -34,9 +30,9 @@ class Cube:
 
 class Snake:
 
-	def __init__(self, pos: tuple, color: tuple, name: str, player_number: int = 1) -> None:
+	def __init__(self, position: tuple, color: tuple, name: str, player_number: int = 1) -> None:
 		self.color = color
-		self.head = Cube(pos, self.color)
+		self.head = Cube(position, self.color)
 		self.body = []
 		self.body.append(self.head)
 		self.turns = {}
@@ -93,8 +89,10 @@ class Snake:
 				if index == len(self.body) - 1:
 					self.turns.pop(head_pos)
 			else:
+				from assets.scripts.menu import walls
 				if walls:  # end game if goes into the wall
 					head.move(head.direction)
+					from snake import end_screen
 					if head.direction[0] == -1 and head.pos[0] < 0:  # left to right
 						end_screen()
 
@@ -159,3 +157,29 @@ class Snack:
 
 	def randomize(self) -> None:
 		self.pos = (randrange(ROWS), randrange(COLUMNS))
+
+
+class Button():
+
+	def __init__(self, position, text, font_size, base_color, hover_color) -> None:
+		self.pos = position
+		self.font = set_font(font_size)
+		self.base_color = base_color
+		self.hover_color = hover_color
+		self.text = text
+		self.text_rect = self.font.render(self.text, 1, self.base_color).get_rect(center=(self.pos))
+
+	def update(self) -> None:
+		WINDOW.blit(self.text, self.text_rect)
+
+	def check_input(self, mouse_pos) -> bool:
+		if mouse_pos[0] in range(self.text_rect.left, self.text_rect.right) and mouse_pos[1] in range(self.text_rect.top, self.text_rect.bottom):
+			return True
+		return False
+
+	def change_color(self, mouse_pos) -> None:
+		if mouse_pos[0] in range(self.text_rect.left,
+		                         self.text_rect.right) and mouse_pos[1] in range(self.text_rect.top, self.text_rect.bottom):  # on hover
+			self.text = self.font.render(self.text, 1, self.hover_color)
+		else:
+			self.text = self.font.render(self.text, 1, self.base_color)

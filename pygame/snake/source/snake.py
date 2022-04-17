@@ -2,6 +2,7 @@
 # Date - 16.04.2022
 # Title - Snake
 
+from glob import glob
 import pygame
 from random import randint
 from os.path import abspath, dirname
@@ -10,6 +11,7 @@ from globals import *
 from assets.scripts.score import *
 from assets.scripts.menu import main_menu
 from assets.scripts.classes import *
+from assets.scripts.menu import FPS, multiplayer, walls
 
 BASE_PATH = abspath(dirname(__file__))
 
@@ -37,12 +39,20 @@ def collision_check(snakes, snack) -> None:
 				snack.randomize()
 
 
-def main() -> None:
+def end_screen() -> None:
+	global run
+	for snake in snakes:
+		write_score(snake.name, len(snake.body), BASE_PATH)
+	run = False
 
-	run = True
+
+def main() -> None:
+	global snakes
+	pygame.display.set_caption("Snake")
+
 	clock = pygame.time.Clock()
 	snake_one = Snake((randint(0, ROWS - 1), randint(0, COLUMNS - 1)), PURPLE, "test1")
-	snakes = [snake_one]
+	snakes.append(snake_one)
 
 	if multiplayer:
 		snake_two = Snake((randint(0, ROWS - 1), randint(0, COLUMNS - 1)), BLUE, "test2", 2)
@@ -90,9 +100,7 @@ def main() -> None:
 
 			for i in range(len(snake.body)):
 				if snake.body[i].pos in list(map(lambda z: z.pos, snake.body[i + 1:])):
-					for snake in snakes:
-						write_score(snake.name, len(snake.body), BASE_PATH)
-					run = False
+					end_screen()
 		redraw_window()
 
 

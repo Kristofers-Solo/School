@@ -7,14 +7,13 @@ WIDTH, HEIGHT = ROWS * CELL_SIZE, COLUMNS * CELL_SIZE
 WINDOW_HEIGHT = HEIGHT + 100
 WINDOW = pygame.display.set_mode((WIDTH, WINDOW_HEIGHT))
 pygame.font.init()
-pygame.display.set_caption("Snake")
 
 BASE_PATH = abspath(dirname(__file__))
+FONT = join(BASE_PATH, "fonts", "roboto.ttf")
 SPRITE_PATH = join(BASE_PATH, "assets", "sprites")
 apple_texture = pygame.transform.scale(pygame.image.load(join(SPRITE_PATH, "golden_apple.png")), (CELL_SIZE, CELL_SIZE))
 poison_texture = pygame.transform.scale(pygame.image.load(join(SPRITE_PATH, "poison.png")), (CELL_SIZE, CELL_SIZE))
 cobblestone_texture = pygame.transform.scale(pygame.image.load(join(SPRITE_PATH, "cobblestone.jpeg")), (CELL_SIZE, CELL_SIZE))
-FONT = join(BASE_PATH, "fonts", "roboto.ttf")
 
 RED = (255, 0, 0)
 WHITE = (242, 242, 242)
@@ -26,6 +25,9 @@ PURPLE = (170, 0, 255)
 BLUE = (85, 85, 255)
 
 set_font = lambda size: pygame.font.Font(FONT, size)  # sets font size
+
+run = True
+snakes = []
 
 FPS = 10  # speed
 multiplayer = False
