@@ -1,8 +1,7 @@
 # Author - Kristiāns Francis Cagulis
-# Date - 16.04.2022
+# Date - 18.04.2022
 # Title - Snake
 
-from glob import glob
 import pygame
 from random import randint
 from os.path import abspath, dirname
@@ -79,7 +78,7 @@ def main() -> None:
 
 	while run:
 		clock.tick(FPS)
-		pygame.time.delay(10)
+		pygame.time.delay(0)
 
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:

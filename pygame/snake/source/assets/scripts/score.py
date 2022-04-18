@@ -1,5 +1,4 @@
 import csv
-import operator
 from os.path import join, exists
 
 fields = ["Name", "Score"]
@@ -20,12 +19,19 @@ def write_score(name: str, score: int, base_path: str) -> None:
 def read_score(path: str):
 	lines = []
 	path = join(path, "score.csv")
-	with open(path, 'r', encoding='UTF-8') as file:
-		for line in csv.reader(file):
-			lines.append(line)
-		return lines
+	try:
+		with open(path, 'r', encoding='UTF-8') as file:
+			for line in csv.reader(file):
+				lines.append(line)
+			return lines
+	except FileNotFoundError:
+		return [fields]
 
 
-def sort(data, reverse: bool = False):
-	data = sorted(data, key=operator.itemgetter(1), reverse=reverse)
+def sort(data, reverse: bool):
+	if reverse == None: reverse = False
+	header = data[0]
+	data.remove(header)  # remove header
+	data = sorted(data, key=lambda x: int(x[1]), reverse=reverse)  # sort data
+	data.insert(0, header)  # add header
 	return data
