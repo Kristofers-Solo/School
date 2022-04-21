@@ -1,5 +1,5 @@
 # Author - Kristiāns Francis Cagulis
-# Date - 18.04.2022
+# Date - 22.04.2022
 # Title - Snake
 
 import pygame
@@ -10,9 +10,10 @@ from globals import *
 from assets.scripts.score import *
 from assets.scripts.menu import main_menu
 from assets.scripts.classes import *
-from assets.scripts.menu import FPS, multiplayer, walls
 
 BASE_PATH = abspath(dirname(__file__))
+
+snakes = []
 
 
 def draw_grid() -> None:
@@ -39,27 +40,26 @@ def collision_check(snakes, snack) -> None:
 
 
 def end_screen() -> None:
-	global run
 	for snake in snakes:
-		write_score(snake.name, len(snake.body), BASE_PATH)
-	run = False
+		if len(snake.body) > 1:
+			write_score(snake.name, len(snake.body) - 1, BASE_PATH)
+	main_menu()
 
 
 def main() -> None:
-	global snakes
+	from globals import fps, multiplayer, walls
 	pygame.display.set_caption("Snake")
 
 	clock = pygame.time.Clock()
-	snake_one = Snake((randint(0, ROWS - 1), randint(0, COLUMNS - 1)), PURPLE, "test1")
+	snake_one = Snake((randint(0, ROWS - 1), randint(0, COLUMNS - 1)), PURPLE, "test1", 1, multiplayer)
 	snakes.append(snake_one)
 
 	if multiplayer:
-		snake_two = Snake((randint(0, ROWS - 1), randint(0, COLUMNS - 1)), BLUE, "test2", 2)
+		snake_two = Snake((randint(0, ROWS - 1), randint(0, COLUMNS - 1)), BLUE, "test2", 2, multiplayer)
 		snakes.append(snake_two)
-
-	apple = Snack(apple_texture)
+	apple = Snack(APPLE_TEXTURE)
 	collision_check(snakes, apple)
-	poison = Snack(poison_texture)
+	poison = Snack(POISON_TEXTURE)
 	collision_check(snakes, poison)
 
 	def redraw_window() -> None:
@@ -72,12 +72,12 @@ def main() -> None:
 		poison.draw_snack()
 		if walls:
 			for i in range(ROWS):
-				cobble_rect = pygame.Rect(i * CELL_SIZE, HEIGHT, WIDTH, CELL_SIZE)
-				WINDOW.blit(cobblestone_texture, cobble_rect)
+				COBBLE_RECT = pygame.Rect(i * CELL_SIZE, HEIGHT, WIDTH, CELL_SIZE)
+				WINDOW.blit(COBBLESTONE_TEXTURE, COBBLE_RECT)
 		pygame.display.update()
 
-	while run:
-		clock.tick(FPS)
+	while True:
+		clock.tick(fps)
 		pygame.time.delay(0)
 
 		for event in pygame.event.get():
@@ -88,13 +88,13 @@ def main() -> None:
 			snake.move()
 			if snake.body[0].pos == apple.pos:
 				snake.add_cube()
-				apple = Snack(apple_texture)
+				apple = Snack(APPLE_TEXTURE)
 				collision_check(snakes, apple)
 
 			if snake.body[0].pos == poison.pos:
 				if len(snake.body) > 1:
 					snake.remove_cube()
-				poison = Snack(poison_texture)
+				poison = Snack(POISON_TEXTURE)
 				collision_check(snakes, poison)
 
 			for i in range(len(snake.body)):
@@ -105,9 +105,3 @@ def main() -> None:
 
 if __name__ == '__main__':
 	main_menu()
-	# for i in range(50, 100):
-	# 	write_score(f"test{i}", randint(1, 1_000_000), BASE_PATH)
-	# csv_file = read_score(BASE_PATH)
-	# # print(csv_file)
-	# for line in sort(csv_file, reverse=True):
-	# 	print(line)

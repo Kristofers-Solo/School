@@ -7,26 +7,7 @@ MID_WIDTH = WIDTH / 2
 MID_HEIGHT = WINDOW_HEIGHT / 2
 
 
-def menu() -> None:
-	while True:
-		WINDOW.fill(BLACK)
-		title_label = set_font(50).render("Press any key to start...", 1, WHITE)
-		WINDOW.blit(title_label, (WIDTH / 2 - title_label.get_width() / 2, WINDOW_HEIGHT / 2 - title_label.get_height() / 2))
-		for event in pygame.event.get():
-			if event.type == pygame.QUIT:
-				csv_file = read_score(BASE_PATH)
-				for line in sort(csv_file, reverse=True):
-					print(line)
-				quit()
-			if event.type == pygame.KEYDOWN:
-				from snake import main
-				main()
-		pygame.display.update()
-
-
 def main_menu() -> None:
-	global run
-	run = True
 	pygame.display.set_caption("Snake - Menu")
 	while True:
 		WINDOW.fill(BLACK)
@@ -61,11 +42,9 @@ def main_menu() -> None:
 
 
 def options() -> None:
-	global FPS
-	global multiplayer
-	global walls
 	pygame.display.set_caption("Snake - Options")
 	while True:
+		from globals import fps, multiplayer, walls
 		mouse_pos = pygame.mouse.get_pos()
 
 		WINDOW.fill(BLACK)
@@ -83,7 +62,7 @@ def options() -> None:
 
 		speed_state = {5: "Slow", 10: "Normal", 15: "Fast"}
 
-		speed_button = Button((MID_WIDTH, MID_HEIGHT - 100), f"SPEED - {speed_state[FPS]}", 75, GRAY, WHITE)
+		speed_button = Button((MID_WIDTH, MID_HEIGHT - 100), f"SPEED - {speed_state[fps]}", 75, GRAY, WHITE)
 		multiplayer_button = Button((MID_WIDTH, MID_HEIGHT), f"MULTIPLAYER - {multiplayer_state}", 75, GRAY, WHITE)
 		walls_button = Button((MID_WIDTH, MID_HEIGHT + 100), f"WALLS - {walls_state}", 75, GRAY, WHITE)
 		back_button = Button((MID_WIDTH, MID_HEIGHT + 200), "BACK", 75, GRAY, WHITE)
@@ -96,13 +75,13 @@ def options() -> None:
 				quit()
 			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 				if speed_button.check_input(mouse_pos):
-					if FPS == 5: FPS = 10
-					elif FPS == 10: FPS = 15
-					elif FPS == 15: FPS = 5
+					change_speed()
 				if multiplayer_button.check_input(mouse_pos):
-					multiplayer = not multiplayer
+					multiplayer = not multiplayer  # switch
+					switch_multiplayer()
 				if walls_button.check_input(mouse_pos):
-					walls = not walls
+					# walls = not walls  # switch
+					switch_walls()
 				if back_button.check_input(mouse_pos):
 					main_menu()
 

@@ -30,7 +30,7 @@ class Cube:
 
 class Snake:
 
-	def __init__(self, position: tuple, color: tuple, name: str, player_number: int = 1) -> None:
+	def __init__(self, position: tuple, color: tuple, name: str, player_number: int = 1, multiplayer: bool = False) -> None:
 		self.color = color
 		self.head = Cube(position, self.color)
 		self.body = []
@@ -39,10 +39,11 @@ class Snake:
 		self.direction = (1, 0)
 		self.number = player_number
 		self.name = name
+		self.multiplayer = multiplayer
 
 	def move(self) -> None:
 		keys = pygame.key.get_pressed()
-		if multiplayer:
+		if self.multiplayer:
 			num_1, num_2 = 1, 2
 		else:
 			num_1, num_2 = 1, 1
@@ -91,8 +92,8 @@ class Snake:
 			else:
 				from assets.scripts.menu import walls
 				if walls:  # end game if goes into the wall
-					head.move(head.direction)
 					from snake import end_screen
+					head.move(head.direction)
 					if head.direction[0] == -1 and head.pos[0] < 0:  # left to right
 						end_screen()
 
