@@ -90,9 +90,9 @@ class Snake:
 				if index == len(self.body) - 1:
 					self.turns.pop(head_pos)
 			else:
-				from assets.scripts.menu import walls
+				from globals import walls
+				from snake import end_screen
 				if walls:  # end game if goes into the wall
-					from snake import end_screen
 					head.move(head.direction)
 					if head.direction[0] == -1 and head.pos[0] < 0:  # left to right
 						end_screen()

@@ -47,6 +47,7 @@ def end_screen() -> None:
 
 
 def main() -> None:
+	snakes.clear()
 	from globals import fps, multiplayer, walls
 	pygame.display.set_caption("Snake")
 
@@ -83,6 +84,9 @@ def main() -> None:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				quit()
+			if event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_ESCAPE:
+					end_screen()
 
 		for snake in snakes:
 			snake.move()
