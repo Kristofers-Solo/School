@@ -15,14 +15,24 @@ APPLE_TEXTURE = pygame.transform.scale(pygame.image.load(join(SPRITE_PATH, "gold
 POISON_TEXTURE = pygame.transform.scale(pygame.image.load(join(SPRITE_PATH, "poison.png")), (CELL_SIZE, CELL_SIZE))
 COBBLESTONE_TEXTURE = pygame.transform.scale(pygame.image.load(join(SPRITE_PATH, "cobblestone.jpeg")), (CELL_SIZE, CELL_SIZE))
 
-RED = (255, 0, 0)
-WHITE = (242, 242, 242)
-GRAY = (204, 204, 204)
-DARK_GRAY = (51, 51, 51)
 BLACK = (0, 0, 0)
-GREEN = (0, 128, 30)
-PURPLE = (170, 0, 255)
+DARK_BLUE = (0, 0, 170)
+DARK_GREEN = (0, 170, 0)
+DARK_AQUA = (0, 170, 170)
+DARK_RED = (170, 0, 0)
+DARK_PURPLE = (170, 170, 0)
+GOLD = (255, 170, 0)
+GRAY = (170, 170, 170)
+DARK_GRAY = (85, 85, 85)
 BLUE = (85, 85, 255)
+GREEN = (85, 255, 85)
+AQUA = (85, 255, 255)
+RED = (255, 85, 85)
+LIGHT_PURPLE = (255, 85, 255)
+YELLOW = (255, 255, 85)
+WHITE = (242, 242, 242)
+
+COLORS = [DARK_BLUE, DARK_GREEN, DARK_AQUA, DARK_RED, DARK_PURPLE, GOLD, BLUE, GREEN, AQUA, RED, LIGHT_PURPLE, YELLOW]
 
 set_font = lambda size: pygame.font.Font(FONT, size)  # sets font size
 

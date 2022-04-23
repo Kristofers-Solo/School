@@ -1,5 +1,5 @@
 # Author - Kristiāns Francis Cagulis
-# Date - 22.04.2022
+# Date - 23.04.2022
 # Title - Snake
 
 import pygame
@@ -52,11 +52,12 @@ def main() -> None:
 	pygame.display.set_caption("Snake")
 
 	clock = pygame.time.Clock()
-	snake_one = Snake((randint(0, ROWS - 1), randint(0, COLUMNS - 1)), PURPLE, "test1", 1, multiplayer)
+	from assets.scripts.menu import user_name, color_index
+	snake_one = Snake((randint(0, ROWS - 1), randint(0, COLUMNS - 1)), COLORS[color_index[0]], user_name[0], 1, multiplayer)
 	snakes.append(snake_one)
 
 	if multiplayer:
-		snake_two = Snake((randint(0, ROWS - 1), randint(0, COLUMNS - 1)), BLUE, "test2", 2, multiplayer)
+		snake_two = Snake((randint(0, ROWS - 1), randint(0, COLUMNS - 1)), COLORS[color_index[1]], user_name[1], 2, multiplayer)
 		snakes.append(snake_two)
 	apple = Snack(APPLE_TEXTURE)
 	collision_check(snakes, apple)
@@ -104,6 +105,14 @@ def main() -> None:
 			for i in range(len(snake.body)):
 				if snake.body[i].pos in list(map(lambda z: z.pos, snake.body[i + 1:])):
 					end_screen()
+		if multiplayer:
+			for i in snakes[0].body:
+				if i.pos == snakes[1].head.pos:
+					end_screen()
+			for i in snakes[1].body:
+				if i.pos == snakes[0].head.pos:
+					end_screen()
+
 		redraw_window()
 
 

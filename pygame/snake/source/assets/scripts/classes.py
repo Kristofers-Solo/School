@@ -5,7 +5,7 @@ from random import randrange
 
 class Cube:
 
-	def __init__(self, position, color=PURPLE) -> None:
+	def __init__(self, position, color=DARK_PURPLE) -> None:
 		self.pos = position
 		self.direction = (1, 0)
 		self.color = color
