@@ -103,6 +103,7 @@ def user_input(player: int) -> None:
 
 				if select_active:
 					if event.key == pygame.K_BACKSPACE: user_name[player] = user_name[player][:-1]
+					elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER: continue
 					else: user_name[player] += event.unicode
 
 				if event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
