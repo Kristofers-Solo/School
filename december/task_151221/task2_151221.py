@@ -9,7 +9,7 @@ file = pd.ExcelFile("dati_masiviem.xlsx")
 data = []
 
 for sheet_name in file.sheet_names:
-	data.append(file.parse(sheet_name))
+    data.append(file.parse(sheet_name))
 
 # print(data[0]["Nosaukums"])
 data[0]["Cena"] = round((data[0]["Pašizmaksa"] + .4) * 1.21, 2)
@@ -42,6 +42,6 @@ found = data[2]["Datums2"] == "2020-09-09"
 
 page_num = 1
 with pd.ExcelWriter("new_file2.xlsx") as file:
-	for page in data:
-		page.to_excel(file, sheet_name=str(page_num), index=False)
-		page_num += 1
+    for page in data:
+        page.to_excel(file, sheet_name=str(page_num), index=False)
+        page_num += 1

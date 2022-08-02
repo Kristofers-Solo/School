@@ -11,9 +11,9 @@ from selenium.webdriver.common.by import By
 use_firefox = True
 
 if use_firefox:
-	browser = webdriver.Firefox()
+    browser = webdriver.Firefox()
 else:
-	browser = webdriver.Chrome("chromedriver")
+    browser = webdriver.Chrome("chromedriver")
 
 address = "https://www.riga.lv/lv"
 browser.get(address)
@@ -25,7 +25,8 @@ search = browser.find_element_by_class_name('search-link')
 search.click()
 
 delay = 2
-WebDriverWait(browser, delay).until(EC.presence_of_all_elements_located((By.ID, 'edit-search')))
+WebDriverWait(browser, delay).until(
+    EC.presence_of_all_elements_located((By.ID, 'edit-search')))
 search = browser.find_element_by_id('edit-search')
 search.send_keys("dokum")  # writes in search line
 
@@ -33,9 +34,11 @@ search = browser.find_element_by_id('search-header-button')
 search.click()
 
 browser.maximize_window()
-WebDriverWait(browser, delay).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'filter-content')))
+WebDriverWait(browser, delay).until(
+    EC.presence_of_all_elements_located((By.CLASS_NAME, 'filter-content')))
 delay = 3
-WebDriverWait(browser, delay).until(EC.presence_of_all_elements_located((By.ID, 'filter_type_file')))
+WebDriverWait(browser, delay).until(
+    EC.presence_of_all_elements_located((By.ID, 'filter_type_file')))
 
 filter = browser.find_element_by_css_selector('label[for="filter_type_file"]')
 filter.click()

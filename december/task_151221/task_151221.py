@@ -9,7 +9,7 @@ file = pd.ExcelFile("dzivnieki.xls")
 data = []
 
 for sheet_name in file.sheet_names:
-	data.append(file.parse(sheet_name))
+    data.append(file.parse(sheet_name))
 
 # print(data)
 # print(data[0])
@@ -22,6 +22,7 @@ for sheet_name in file.sheet_names:
 new_data = pd.concat([data[0], data[1]])  # concatenates data
 # print(new_data)
 
-print(new_data.sort_values("Vecums", ascending=False))  # sorts table by age, inverted
+# sorts table by age, inverted
+print(new_data.sort_values("Vecums", ascending=False))
 
 new_data.to_excel("new_file.xls", index=False)

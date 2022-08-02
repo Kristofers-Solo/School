@@ -18,17 +18,20 @@ data = pd.read_csv("auto_imports_mainits.csv", na_values=dislike)
 del data["normalized-losses"]
 
 select_data = data[["make", "engine-size", "num-of-doors"]]
-select_data = select_data.sort_values(by=["make", "engine-size", "num-of-doors"])
+select_data = select_data.sort_values(
+    by=["make", "engine-size", "num-of-doors"])
 select_data = select_data.drop_duplicates()
 
 col_width = usable_w / 3
 height = pdf.font_size * 2
 
 for i in range(select_data.shape[0]):
-	pdf.cell(col_width, height, str(select_data["make"].iloc[i]), border=1)
-	pdf.cell(col_width, height, str(select_data["engine-size"].iloc[i]), border=1)
-	pdf.cell(col_width, height, str(select_data["num-of-doors"].iloc[i]), border=1)
-	pdf.ln(height)
+    pdf.cell(col_width, height, str(select_data["make"].iloc[i]), border=1)
+    pdf.cell(col_width, height, str(
+        select_data["engine-size"].iloc[i]), border=1)
+    pdf.cell(col_width, height, str(
+        select_data["num-of-doors"].iloc[i]), border=1)
+    pdf.ln(height)
 
 # pdf.image("output.png", x=None, y=None, w=usable_w, h=0)
 pdf.output("output.pdf")

@@ -1,55 +1,55 @@
 html,
 body {
-	font-family: "Roboto", sans-serif;
-	background: #f2f2f2;
-	margin: 0;
-	padding: 0;
+  font-family: 'Roboto', sans-serif;
+  background: #f2f2f2;
+  margin: 0;
+  padding: 0;
 }
 
 #product {
-	display: flex;
-	margin-top: 10px;
-	height: 30px;
-	margin-left: auto;
-	margin-right: auto;
-	background-color: #333333;
-	width: 95%;
-	min-width: 100px;
-	border-radius: 5px;
-	cursor: pointer;
-	color: #cccccc;
+  display: flex;
+  margin-top: 10px;
+  height: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #333333;
+  width: 95%;
+  min-width: 100px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #cccccc;
 }
 
 #show {
-	display: block;
-	border: none;
-	margin: auto;
-	margin-top: 10px;
-	margin-bottom: 10px;
-	min-width: 200px;
+  display: block;
+  border: none;
+  margin: auto;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  min-width: 200px;
 
-	background: #666666;
+  background: #666666;
 
-	border-radius: 5px;
-	padding: 10px;
-	color: #f2f2f2;
-	outline: none;
-	width: 95%;
-	font-size: 18px;
-	text-transform: uppercase;
-	cursor: pointer;
-	transition: transform 0.7s ease;
+  border-radius: 5px;
+  padding: 10px;
+  color: #f2f2f2;
+  outline: none;
+  width: 95%;
+  font-size: 18px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.7s ease;
 }
 
 #show:hover {
-	opacity: 0.9;
-	transform: scale(1.01);
+  opacity: 0.9;
+  transform: scale(1.01);
 }
 
 #info {
-	color: #666666;
-	display: block;
-	text-align: center;
-	font-size: 16px;
-	font-weight: bold;
+  color: #666666;
+  display: block;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
 }

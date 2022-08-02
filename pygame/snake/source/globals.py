@@ -1,5 +1,5 @@
-import pygame
 from os.path import join, abspath, dirname
+import pygame
 
 CELL_SIZE = 30
 ROWS, COLUMNS = 30, 20
@@ -11,9 +11,12 @@ pygame.font.init()
 BASE_PATH = abspath(dirname(__file__))
 FONT = join(BASE_PATH, "fonts", "roboto.ttf")
 SPRITE_PATH = join(BASE_PATH, "assets", "sprites")
-APPLE_TEXTURE = pygame.transform.scale(pygame.image.load(join(SPRITE_PATH, "golden_apple.png")), (CELL_SIZE, CELL_SIZE))
-POISON_TEXTURE = pygame.transform.scale(pygame.image.load(join(SPRITE_PATH, "poison.png")), (CELL_SIZE, CELL_SIZE))
-COBBLESTONE_TEXTURE = pygame.transform.scale(pygame.image.load(join(SPRITE_PATH, "cobblestone.jpeg")), (CELL_SIZE, CELL_SIZE))
+APPLE_TEXTURE = pygame.transform.scale(pygame.image.load(
+    join(SPRITE_PATH, "golden_apple.png")), (CELL_SIZE, CELL_SIZE))
+POISON_TEXTURE = pygame.transform.scale(pygame.image.load(
+    join(SPRITE_PATH, "poison.png")), (CELL_SIZE, CELL_SIZE))
+COBBLESTONE_TEXTURE = pygame.transform.scale(pygame.image.load(
+    join(SPRITE_PATH, "cobblestone.jpeg")), (CELL_SIZE, CELL_SIZE))
 
 BLACK = (0, 0, 0)
 DARK_BLUE = (0, 0, 170)
@@ -32,9 +35,12 @@ LIGHT_PURPLE = (255, 85, 255)
 YELLOW = (255, 255, 85)
 WHITE = (242, 242, 242)
 
-COLORS = [DARK_BLUE, DARK_GREEN, DARK_AQUA, DARK_RED, DARK_PURPLE, GOLD, BLUE, GREEN, AQUA, RED, LIGHT_PURPLE, YELLOW]
+COLORS = [DARK_BLUE, DARK_GREEN, DARK_AQUA, DARK_RED, DARK_PURPLE,
+          GOLD, BLUE, GREEN, AQUA, RED, LIGHT_PURPLE, YELLOW]
 
-set_font = lambda size: pygame.font.Font(FONT, size)  # sets font size
+
+def set_font(size): return pygame.font.Font(FONT, size)  # sets font size
+
 
 fps = 10  # speed
 multiplayer = False
@@ -42,17 +48,20 @@ walls = False
 
 
 def change_speed() -> None:
-	global fps
-	if fps == 5: fps = 10
-	elif fps == 10: fps = 15
-	elif fps == 15: fps = 5
+    global fps
+    if fps == 5:
+        fps = 10
+    elif fps == 10:
+        fps = 15
+    elif fps == 15:
+        fps = 5
 
 
 def switch_multiplayer() -> None:
-	global multiplayer
-	multiplayer = not multiplayer
+    global multiplayer
+    multiplayer = not multiplayer
 
 
 def switch_walls() -> None:
-	global walls
-	walls = not walls
+    global walls
+    walls = not walls

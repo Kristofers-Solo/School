@@ -6,3 +6,4 @@
 /december/task_081221/*.log
 **.pkl
 **test.py
+pygame/snake/source/score.csv
